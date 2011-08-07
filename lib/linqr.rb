@@ -1,15 +1,16 @@
 class Linqr
   Scope = Struct.new(:expressions)
   Expression = Struct.new(:symbol, :args, :lineno, :proc, :scope)
-  Output = Struct.new(:file, :expressions)
+  Output = Struct.new(:file, :expressions,:sel_var)
 
   VERSION = '0.2.0'
 
-  METHODS_TO_KEEP = /^__/, /class/, /instance_/, /method_missing/, /object_id/
+  METHODS_TO_KEEP = /^__/, /class/, /instance_/, /method_missing/, /object_id/, /define_singleton_method/
 
   instance_methods.each do |m|
     undef_method m unless METHODS_TO_KEEP.find { |r| r.match m }
   end
+  undef_method :select
 
   def initialize(opts = {})
     @@remember_blocks_starting_with = Array(opts[:retain_blocks_for])
@@ -22,6 +23,7 @@ class Linqr
 
   def to_data(&block)
     instance_exec(&block)
+    @@output.sel_var = @sel_var
     output
   end
 
@@ -40,6 +42,11 @@ class Linqr
   end
 
   def method_missing(sym, *args, &block)
+    unless @sel_var
+      @sel_var = Linqr.new
+      define_singleton_method (sym) {@sel_var}
+    end
+
     caller[0] =~ (/(.*):(.*):in?/)
     file, lineno = $1, $2
     self.file = file
@@ -55,7 +62,6 @@ class Linqr
     @current_scope ||= Scope.new([])
     @current_scope.expressions << Expression.new(sym, args, lineno)
     if block
-      # there is some simpler recursive way of doing this, will fix it shortly
       if @@remember_blocks_starting_with.include? sym
         @current_scope.expressions.last.proc = block
       else
@@ -76,10 +82,11 @@ end
 
 class Object
   def _(&block)
-     output = Linqr.new(:retain_blocks_for => [:where, :selectr]).to_data(&block)
-     enumerable  = output.expressions.select{|e| e.symbol == :from}.first.args
-     filter =   output.expressions.select{|e| e.symbol == :where}.first.proc
-     selector = output.expressions.select{|e| e.symbol == :selectr}.first.proc
-     enumerable.select(&filter).collect(&selector)
+     output = Linqr.new(:retain_blocks_for => [:where, :select]).to_data(&block)
+     enumerable  = output.expressions.select{|e| e.symbol == :in_}.first.args
+     sel_var = output.sel_var.output
+     filter = sel_var.expressions.first
+     selector =sel_var.expressions[1]
+     enumerable.select{|x| x.send(filter.symbol,filter.args) == true}.collect{|x| x.send(selector.symbol,selector.args)}
   end
 end
