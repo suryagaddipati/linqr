@@ -1,0 +1,22 @@
+= Linqr
+
+ Aims to bring Linq like sytax to ruby. I wish we didnt have learn different apis for querying an array and ActiveRecord model.
+ Linq in C# was a great example of bringing a uniform query api to different sources of Data.
+
+
+
+== Usage
+
+numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+    output =  _{ 
+      from x
+      in_ numbers
+      where x > 1
+      select x * 3
+    }
+    output.should == [15, 12, 9, 27, 24, 18, 21, 6]
+
+== Copyright
+
+Copyright (c) 2011 Surya Gaddipati.
+
