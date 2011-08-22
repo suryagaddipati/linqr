@@ -1,17 +1,8 @@
-module  Enumerable
+class  ActiveRecord::Base
 
   def evaluate_exp(linq_exp)
-    #assuming to be a binary expression
-    filtered_values = self.select do|e| 
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
-      linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end
 
-    #assuming to be a binary expression
-    filtered_values.collect do |e|
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
-      linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end
+    debugger
   end
 
 
@@ -40,9 +31,6 @@ class EnumerableExpessionEvaluator
   def visit_statements(node)
     binary_exp = node.elements.first
     binary_exp.visit(self)
-  end
-  def visit_arg(node)
-    node.arg.visit(self)
   end
 
 end

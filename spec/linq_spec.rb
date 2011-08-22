@@ -11,6 +11,12 @@ if File.exists?(database_yml)
     load(File.dirname(__FILE__) + '/order.rb')
 end
 end
+class Object
+  # alias_method :try, :__send__
+  def try(method, *args, &block)
+    send(method, *args, &block) if respond_to?(method)
+  end
+end
 
 describe "linqr" do
   it "simple binary expression" do 
@@ -29,7 +35,7 @@ describe "linqr" do
       from x
       in_ numbers
       where (x % 2) > 0
-      select x * 1
+      select x
     }
     output.should == [ 5, 1, 3, 9, 7 ]
   end
@@ -47,7 +53,7 @@ describe "linqr" do
         output =  _{ 
           from o
           in_ Order
-          where r.name == "second"
+          where o.name == "second"
           select x.name
         }
         output.should == ["second"]

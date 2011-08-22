@@ -16,6 +16,7 @@ class LinqrExp
       fcall(@exp,"from").arguments.first.arg.to_s
   end
   def select
+    debugger
     fexp(@exp,"select")
   end
   def fcall(exp, fname)
@@ -24,10 +25,19 @@ class LinqrExp
 
   def fexp(exp, fname)
     f_arg = fcall(exp,fname).arguments.first
-    f_arg.elements.first # make this less confusing
+    f_arg # make this less confusing
   end
   def source
-    source_name = fcall(@exp,"in_").select(Ruby::Arg).first.arg.token
+    token = fcall(@exp,"in_").select(Ruby::Arg).first.arg
+    source_name = token.evaluate_source(self)
     @binding.eval(source_name)
+  end
+
+
+  def source_name_const(node)
+    node.identifier.to_s
+  end
+  def source_name_variable(node)
+    node.token.to_s
   end
 end
