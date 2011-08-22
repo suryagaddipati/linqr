@@ -1,4 +1,17 @@
 require 'linqr'
+require 'active_record'
+ENV['DB'] ||= "mysql"
+database_yml = File.expand_path('../database.yml', __FILE__)
+if File.exists?(database_yml)
+  active_record_configuration = YAML.load_file(database_yml)[ENV['DB']]
+  ActiveRecord::Base.establish_connection(active_record_configuration)
+  ActiveRecord::Base.silence do
+    ActiveRecord::Migration.verbose = false
+    load(File.dirname(__FILE__) + '/schema.rb')
+    load(File.dirname(__FILE__) + '/order.rb')
+end
+end
+
 describe "linqr" do
   it "simple binary expression" do 
     numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
@@ -19,5 +32,25 @@ describe "linqr" do
       select x * 1
     }
     output.should == [ 5, 1, 3, 9, 7 ]
+  end
+  
+  describe "ActiveRecord Provider" do
+    before {
+      ActiveRecord::Base.connection.execute "DELETE FROM Orders"  
+      }
+
+
+      it "should select from active-record" do
+        Order.create(:name => "first")
+        Order.create(:name => "second")
+
+        output =  _{ 
+          from o
+          in_ Order
+          where r.name == "second"
+          select x.name
+        }
+        output.should == ["second"]
+      end
   end
 end
