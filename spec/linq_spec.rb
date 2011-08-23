@@ -26,10 +26,10 @@ describe "linqr" do
     output =  _{ 
       from x
       in_ numbers
-      where x == 3 ||  x == 5
+      where (x == 3 ||  x == 5 || x == 8) && ( x % 2) == 0
       select x
     }
-    output.should == [ 5,3]
+    output.should == [8]
   end
   it"compound 'and'  binary expression"do 
     numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
