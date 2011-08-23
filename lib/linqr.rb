@@ -1,4 +1,5 @@
 require 'enumerable_provider'
+require 'activerecord_provider'
 require 'linqr_exp'
 $:.unshift File.join(File.dirname(__FILE__), '..','ripper2ruby', 'lib')
 require 'ripper2ruby'

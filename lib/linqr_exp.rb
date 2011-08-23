@@ -16,7 +16,6 @@ class LinqrExp
       fcall(@exp,"from").arguments.first.arg.to_s
   end
   def select
-    debugger
     fexp(@exp,"select")
   end
   def fcall(exp, fname)

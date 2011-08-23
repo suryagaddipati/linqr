@@ -49,14 +49,17 @@ describe "linqr" do
       it "should select from active-record" do
         Order.create(:name => "first")
         Order.create(:name => "second")
+        second_order = Order.find(:all , :conditions => {:name => "second"})
 
+        orders = Order.new #change this to order
         output =  _{ 
           from o
-          in_ Order
+          in_  orders
           where o.name == "second"
-          select x.name
+          select o
+
         }
-        output.should == ["second"]
+        output.should == second_order
       end
   end
 end
