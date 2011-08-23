@@ -10,6 +10,9 @@ class Ruby::Node
   def evaluate_source(visitor)
     visitor.send("source_name_#{self.class.name.split("::")[1].downcase}".to_sym, self)
   end
+  def to_sym
+    to_ruby.to_sym
+  end
 end
 
 class Object
