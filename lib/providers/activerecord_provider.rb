@@ -1,5 +1,5 @@
 require 'active_record'
-require 'enumerable_provider'
+require 'providers/enumerable_provider'
 class ActiveRecord::Base
 
   def evaluate_exp(linq_exp)
