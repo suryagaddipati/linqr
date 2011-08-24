@@ -1,8 +1,8 @@
 = Linqr
 
- Linq ( http://msdn.microsoft.com/en-us/vcsharp/aa336746 )like sytax for ruby.
+Linq ( http://msdn.microsoft.com/en-us/vcsharp/aa336746 )like sytax for ruby.
 
- Linq in C# is a great example of bringing a uniform query model to
+Linq in C# is a great example of bringing a uniform query model to
 different sources of Data. Different providers can be hooked into the
 model so developers can still use the familiar sytax to query the data
 source instead of learning the whole new api.
@@ -33,14 +33,13 @@ source instead of learning the whole new api.
 
 
 2. ActiveRecord provider
-     output =  _{·
-      from o
-      in_  Order 
-      where o.name == "second"
-      select o
-    
-    }
-    output.should == second_order
+  output =  _{·
+  from o
+  in_  Order 
+  where o.name == "second"
+  select o
+  }
+  output.should == second_order
 
 3.Groupon api provider
     output =  _{·
