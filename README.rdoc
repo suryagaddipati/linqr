@@ -31,6 +31,17 @@ source instead of learning the whole new api.
       }
   output.should == [15, 12, 9, 27, 24, 18, 21, 6]
 
+Quering hash
+
+    hash = {:a => 1 , :b => 2 , :c => 3}
+    output = _{
+      from k,v
+      in_ hash
+      where v == 3
+      select k
+    }
+    output.should == [:c]
+
 
 2. ActiveRecord provider
   output =  _{·

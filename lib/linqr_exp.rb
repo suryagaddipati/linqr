@@ -13,7 +13,7 @@ class LinqrExp
     fexp(@exp,"where")
   end
   def variable
-      fcall(@exp,"from").arguments.first.arg.to_s
+    variables.first
   end
   def variables
     fcall(@exp,"from").arguments.collect{|a|a.arg.to_s}
