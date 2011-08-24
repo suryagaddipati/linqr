@@ -15,6 +15,9 @@ class LinqrExp
   def variable
       fcall(@exp,"from").arguments.first.arg.to_s
   end
+  def variables
+    fcall(@exp,"from").arguments.collect{|a|a.arg.to_s}
+  end
   def select
     fexp(@exp,"select")
   end

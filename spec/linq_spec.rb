@@ -41,4 +41,15 @@ describe "linqr" do
     }
     output.should == [ '5','4']
   end
+
+  it "query associative array" do
+    hash = {:a => 1 , :b => 2 , :c => 3}
+    output = _{
+      from k,v
+      in_ hash
+      where v == 3
+      select k
+    }
+    output.should == [:c]
+  end
 end
