@@ -1,20 +1,54 @@
 = Linqr
 
- Aims to bring Linq like sytax to ruby. I wish we didnt have learn different apis for querying an array and ActiveRecord model.
- Linq in C# was a great example of bringing a uniform query api to different sources of Data.
+ Linq ( http://msdn.microsoft.com/en-us/vcsharp/aa336746 )like sytax for ruby.
+
+ Linq in C# is a great example of bringing a uniform query model to
+different sources of Data. Different providers can be hooked into the
+model so developers can still use the familiar sytax to query the data
+source instead of learning the whole new api.
+
+
+
 
 
 
 == Usage
 
-numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    output =  _{ 
-      from x
-      in_ numbers
-      where x > 1
-      select x * 3
+1. Enumerable provider  
+  numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+  output =  _{·
+        from x
+        in_ numbers
+        where x > 3 && x <= 5
+        select x.to_s
+      }  
+      output.should == [ '5','4']
+      output =  _{ 
+        from x
+        in_ numbers
+        where x > 1
+        select x * 3
+      }
+  output.should == [15, 12, 9, 27, 24, 18, 21, 6]
+
+
+2. ActiveRecord provider
+     output =  _{·
+      from o
+      in_  Order 
+      where o.name == "second"
+      select o
+    
     }
-    output.should == [15, 12, 9, 27, 24, 18, 21, 6]
+    output.should == second_order
+
+3.Groupon api provider
+    output =  _{·
+      from deal
+      in_  GrouponDeals
+      where deal.lat == 38.8339 && deal.lng == -104.821·
+      select deal
+    }
 
 == Copyright
 
