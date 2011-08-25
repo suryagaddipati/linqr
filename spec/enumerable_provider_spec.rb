@@ -52,4 +52,45 @@ describe "linqr" do
     }
     output.should == [:c]
   end
+
+  it  "should work with models" do
+    Product = Struct.new(:name, :price)
+    products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
+    
+    cheap_product_names = _{
+      from p
+      in_ products 
+      where p.price < 10
+      select p.name
+    }
+
+    cheap_product_names.should == ["shoes","pencil"]
+  end
+
+  it "select into anonymous types" do
+    Product = Struct.new(:name, :price)
+    products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
+    
+    cheap_product_names = _{
+      from p
+      in_ products 
+      where p.price < 10
+      select :name => "Cheap - #{p.name}"
+    }
+    
+    cheap_product_names.should == ["shoes","pencil"]
+
+  end
+
+  context "group by" do
+    it "simple-1" do
+      numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+      numberGroups = _{
+        from n 
+        in_ numbers
+        group_by n % 5  => g 
+        select g.key
+      }
+    end
+  end
 end
