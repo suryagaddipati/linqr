@@ -75,22 +75,23 @@ describe "linqr" do
       from p
       in_ products 
       where p.price < 10
-      select :name => "Cheap - #{p.name}"
+      select :name => "Cheap - #{p.name}" , :new_price => p.price + 10
     }
     
-    cheap_product_names.should == ["shoes","pencil"]
+    cheap_product_names.collect(&:name).should == ["Cheap - shoes","Cheap - pencil"]
+    cheap_product_names.collect(&:new_price).should == [11.75, 15.20]
 
   end
 
   context "group by" do
     it "simple-1" do
       numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-      numberGroups = _{
-        from n 
-        in_ numbers
-        group_by n % 5  => g 
-        select g.key
-      }
+     #numberGroups = _{
+     #  from n 
+     #  in_ numbers
+     #  group_by n % 5  => g 
+     #  select g.key
+     #}
     end
   end
 end

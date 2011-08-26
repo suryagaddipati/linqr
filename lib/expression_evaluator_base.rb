@@ -23,7 +23,15 @@ class ExpressionEvaluator
     node.arg.visit(self)
   end
   def visit_string(node)
-    node.value
+    output = ""
+    node.each do |e|
+      output << e.visit(self)
+    end
+    output
+  end
+  
+  def visit_stringcontent(node)
+    node.to_s
   end
 
   def visit_statements(node)

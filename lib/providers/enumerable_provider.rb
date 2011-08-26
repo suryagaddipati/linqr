@@ -31,7 +31,20 @@ module  Enumerable
 end
 
 
+require 'ostruct'
 class EnumerableExpessionEvaluator < ExpressionEvaluator
+  def visit_symbol(node)
+    node.value
+  end
+  def visit_hash(node)
+    record = OpenStruct.new
+    node.elements.each do |e|
+      key = e.key.visit(self)
+      value = e.value.visit(self)
+      record.send("#{key.to_s}=".to_sym,value)
+    end
+    record
+  end
 
   def visit_binary(node)
     right_val = node.right.visit(self)
