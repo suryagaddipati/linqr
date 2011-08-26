@@ -89,11 +89,12 @@ describe "linqr" do
       numberGroups = _{
         from n 
         in_ numbers
-        group_by n % 5  => :g 
-        select g.key
+        where x > 3 && x < 100
+        group_by n % 5  => :g
+        select :remainder => g.key , :values => g.values
       }
 
-      numberGroups.should == [0, 4, 1, 3, 2]
+      numberGroups.collect(&:remainder).should == [0, 4, 1, 3, 2]
     end
   end
 end
