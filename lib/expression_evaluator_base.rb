@@ -4,6 +4,10 @@ class ExpressionEvaluator
     @binding = linq_exp.binding
   end
 
+  def visit_symbol(node)
+    node.value
+  end
+
   def visit_variable(node)
     @binding.eval(node.to_s)
   end

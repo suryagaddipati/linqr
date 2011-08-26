@@ -12,6 +12,11 @@ class LinqrExp
   def where
     fexp(@exp,"where")
   end
+
+  def group_by
+    fexp(@exp,"group_by")
+  end
+
   def variable
     variables.first
   end
@@ -23,6 +28,13 @@ class LinqrExp
   end
   def fcall(exp, fname)
     exp.select(Ruby::Call).select {|call| call.token == fname}.first
+  end
+
+  def where_defined?
+    !fcall(@exp,"where").nil?
+  end
+  def group_by?
+    !fcall(@exp,"group_by").nil?
   end
 
   def fexp(exp, fname)

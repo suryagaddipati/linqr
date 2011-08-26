@@ -1,4 +1,5 @@
 require 'expression_evaluator_base'
+GroupBy = Struct.new(:key,:values)
 module  Enumerable
 
   def evaluate_exp(linq_exp)
@@ -16,15 +17,38 @@ module  Enumerable
       end
 
     else
-      filtered_values = self.select do|e| 
-        Object.send(:define_method,linq_exp.variable.to_sym) { e }
-        linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
+#where
+      if (linq_exp.where_defined?)
+        filtered_values = self.select do|e| 
+          Object.send(:define_method,linq_exp.variable.to_sym) { e }
+          linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
+        end
+      else
+        filtered_values  = self
       end
 
-      filtered_values.collect do |e|
-        Object.send(:define_method,linq_exp.variable.to_sym) { e }
+      if (linq_exp.group_by?)
+
+        #group_by
+        group_by_evaluator = GroupByExpressionEvaluator.new(linq_exp)
+        grouped_values = filtered_values.group_by do |e|
+          Object.send(:define_method,linq_exp.variable.to_sym) { e }
+          linq_exp.group_by.visit(group_by_evaluator)
+        end
+
+        grouped_values.collect do |(k,v)|
+          Object.send(:define_method,group_by_evaluator.grouping_var) { GroupBy.new(k,v) }
         linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+        end
+      else
+
+        #select
+        filtered_values.collect do |e|
+          Object.send(:define_method,linq_exp.variable.to_sym) { e }
+          linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+        end
       end
+
     end
 
   end
@@ -33,9 +57,6 @@ end
 
 require 'ostruct'
 class EnumerableExpessionEvaluator < ExpressionEvaluator
-  def visit_symbol(node)
-    node.value
-  end
   def visit_hash(node)
     record = OpenStruct.new
     node.elements.each do |e|
@@ -62,5 +83,12 @@ class EnumerableExpessionEvaluator < ExpressionEvaluator
     target = node.target.visit(self)
     target.send(node.identifier.to_sym)
   end
+end
 
+class GroupByExpressionEvaluator < EnumerableExpessionEvaluator 
+  attr_reader :grouping_var
+  def visit_hash(node)
+    @grouping_var = node.first.value.visit(self)
+    node.first.key.visit(self)
+  end
 end

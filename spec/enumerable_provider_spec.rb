@@ -86,12 +86,14 @@ describe "linqr" do
   context "group by" do
     it "simple-1" do
       numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-     #numberGroups = _{
-     #  from n 
-     #  in_ numbers
-     #  group_by n % 5  => g 
-     #  select g.key
-     #}
+      numberGroups = _{
+        from n 
+        in_ numbers
+        group_by n % 5  => :g 
+        select g.key
+      }
+
+      numberGroups.should == [0, 4, 1, 3, 2]
     end
   end
 end
