@@ -23,6 +23,13 @@ module  Enumerable
       linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
+  def handle_order_by(linq_exp,filtered_values)
+    return filtered_values unless linq_exp.order_by?
+    filtered_values.sort_by do|e| 
+      Object.send(:define_method,linq_exp.variable.to_sym) { e }
+      linq_exp.order_by.visit(EnumerableExpessionEvaluator.new(linq_exp))
+    end
+  end
   def handle_select(linq_exp,filtered_values)
     filtered_values.collect do |e|
       Object.send(:define_method,linq_exp.variable.to_sym) { e }
@@ -48,6 +55,7 @@ module  Enumerable
       handle_hash(linq_exp)
     else
       filtered_values = handle_where(linq_exp)
+      filtered_values = handle_order_by(linq_exp,filtered_values)
       if (linq_exp.group_by?)
         handle_group_by(linq_exp,filtered_values)
       else

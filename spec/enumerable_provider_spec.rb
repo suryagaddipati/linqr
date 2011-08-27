@@ -86,7 +86,7 @@ describe "linqr" do
   context "group by" do
     it "simple-1" do
       numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-      numberGroups = _{
+      number_groups = _{
         from n 
         in_ numbers
         where x > 3 && x < 100
@@ -94,7 +94,21 @@ describe "linqr" do
         select :remainder => g.key , :values => g.values
       }
 
-      numberGroups.collect(&:remainder).should == [0, 4, 1, 3, 2]
+      number_groups.collect(&:remainder).should == [0, 4, 1, 3, 2]
     end
+  end
+
+  describe "order by" do
+
+   it "should order by the order by operator" do
+      words = [ "cherry", "apple", "blueberry" ]
+      sorted_words = _{
+        from word 
+        in_ words
+        order_by word
+        select word
+      }
+      sorted_words.should ==  ["apple", "blueberry","cherry" ]
+   end
   end
 end
