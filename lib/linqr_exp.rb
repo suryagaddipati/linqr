@@ -1,6 +1,13 @@
 require 'sourcify'
 require 'ripper'
 class LinqrExp
+
+ %w(where group_by from select order_by).each do | q |
+   send(:define_method,q.to_sym) { fexp(@exp,q) }
+   send(:define_method,(q+"?").to_sym) {!fcall(@exp,q).nil?}
+ end
+
+
   attr_reader :binding
   def initialize(&proc_exp)
     @exp = Ripper::RubyBuilder.build(proc_exp.to_source)
@@ -9,13 +16,6 @@ class LinqrExp
   def evaluate 
     source.evaluate_exp(self)
   end
-  def where
-    fexp(@exp,"where")
-  end
-
-  def group_by
-    fexp(@exp,"group_by")
-  end
 
   def variable
     variables.first
@@ -23,19 +23,10 @@ class LinqrExp
   def variables
     fcall(@exp,"from").arguments.collect{|a|a.arg.to_s}
   end
-  def select
-    fexp(@exp,"select")
-  end
   def fcall(exp, fname)
     exp.select(Ruby::Call).select {|call| call.token == fname}.first
   end
 
-  def where_defined?
-    !fcall(@exp,"where").nil?
-  end
-  def group_by?
-    !fcall(@exp,"group_by").nil?
-  end
 
   def fexp(exp, fname)
     f_arg = fcall(exp,fname).arguments.first
