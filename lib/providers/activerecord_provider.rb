@@ -22,6 +22,9 @@ class ActiveRecordExpressionEvaluator
     @conditions = {}
   end
 
+  def visit_argslist(node)
+    node.first.visit(self)
+  end
   def visit_variable(node)
     @binding.eval(node.to_s)
   end
@@ -44,7 +47,14 @@ class ActiveRecordExpressionEvaluator
   end
 
   def visit_call(node)
-    node.identifier.to_s.to_sym
+    call = node.identifier.to_sym
+    return call unless call == :member?
+    target = node.target.visit(self)
+    argument = node.arguments.visit(self)
+    @conditions[argument] = target
+  end
+  def visit_array(node)
+    node.value
   end
 
   def visit_statements(node)

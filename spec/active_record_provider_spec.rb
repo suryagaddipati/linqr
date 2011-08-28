@@ -33,4 +33,23 @@ describe "ActiveRecord Provider" do
     }
     output.should == second_order
   end
+  
+  describe "in" do
+    it "should retrive all object" do
+      Order.create(:name => "first")
+      Order.create(:name => "second")
+      Order.create(:name => "third")
+
+
+    first_second = Order.find(:all , :conditions => {:name => ["second", "first"]})
+      orders = Order.new #change this to order
+      output =  _{ 
+        from o
+        in_  orders
+        where ["second", "first"].member?(o.name)
+        select o
+      }
+      output.should == first_second
+    end
+  end
 end

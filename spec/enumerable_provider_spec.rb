@@ -110,5 +110,17 @@ describe "linqr" do
       }
       sorted_words.should ==  ["apple", "blueberry","cherry" ]
    end
+   
+   it "simple-2" do
+      words = [ "cherry", "apple", "blueberry" ]
+      sorted_words = _{
+        from word 
+        in_ words
+        order_by word.length
+        select word
+      }
+      sorted_words.should == ["apple", "cherry", "blueberry"]
+
+   end
   end
 end
