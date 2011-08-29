@@ -1,37 +1,28 @@
-= Linqr
+= Linqr - Query Comprehensions for Ruby
 
 Linq ( http://msdn.microsoft.com/en-us/vcsharp/aa336746 )like sytax for ruby.
 
 Linq in C# is a great example of bringing a uniform query model to
 different sources of Data. Different providers can be hooked into the
 model so developers can still use the familiar sytax to query the data
-source instead of learning the whole new api.
-
-
-
-
+source instead of learning a whole new api.
 
 
 == Usage
 
-1. Enumerable provider  
-  numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-  output =  _{·
-        from x
-        in_ numbers
-        where x > 3 && x <= 5
-        select x.to_s
-      }  
-      output.should == [ '5','4']
-      output =  _{ 
-        from x
-        in_ numbers
-        where x > 1
-        select x * 3
-      }
-  output.should == [15, 12, 9, 27, 24, 18, 21, 6]
+=== Querying enumerable
+* Quering an array
 
-Quering hash
+    numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+    output =  _{ 
+      from x
+      in_ numbers
+      where (x == 3 ||  x == 5 || x == 8) && ( x % 2) == 0
+      select x
+    }
+    output.should == [8]
+
+* Quering a hash
 
     hash = {:a => 1 , :b => 2 , :c => 3}
     output = _{
@@ -40,10 +31,47 @@ Quering hash
       where v == 3
       select k
     }
-    output.should == [:c]
+   output.should == [:c]
 
+* Grouping(select can select into anonymous types)
 
-2. ActiveRecord provider
+    numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+    number_groups = _{
+      from n 
+      in_ numbers
+      where x > 3 && x < 100
+      group_by n % 5  => :g
+      select :remainder => g.key , :values => g.values
+    }
+    number_groups.collect(&:remainder).should == [0, 4, 1, 3, 2]
+
+* Ordering 
+
+    words = [ "cherry", "apple", "blueberry" ]
+    sorted_words = _{
+      from word 
+      in_ words
+      order_by word.length
+      select word
+    }
+    sorted_words.should == ["apple", "cherry", "blueberry"]
+* Selecting into anonymous types
+
+    products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
+    
+    cheap_product_names = _{
+      from p
+      in_ products 
+      where p.price < 10
+      select :name => "Cheap - #{p.name}" , :new_price => p.price + 10
+    }
+    
+    cheap_product_names.collect(&:name).should == ["Cheap - shoes","Cheap - pencil"]
+    cheap_product_names.collect(&:new_price).should == [11.75, 15.20]
+
+=== Querying ActiveRecord Models
+ All the examples listed for enumerable should work with activerecord models too
+
   output =  _{·
   from o
   in_  Order 
@@ -52,15 +80,11 @@ Quering hash
   }
   output.should == second_order
 
-3.Groupon api provider
+=== Querying Groupon Api
     output =  _{·
       from deal
       in_  GrouponDeals
       where deal.lat == 38.8339 && deal.lng == -104.821·
       select deal
     }
-
-== Copyright
-
-Copyright (c) 2011 Surya Gaddipati.
 
