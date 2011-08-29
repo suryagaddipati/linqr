@@ -50,6 +50,26 @@ describe "ActiveRecord Provider" do
     grouped_by_name.collect(&:name).should == ["first", "second", "third"]
     end
   end
+  
+  describe "order by" do
+
+   it "should order by the order by operator" do
+      Order.create(:name => "berry")
+      Order.create(:name => "apple")
+      Order.create(:name => "peach")
+      Order.create(:name => "cherry")
+
+    expected_output = Order.find(:all , :order => :name).collect(&:name)
+
+    ordered_names = _{
+        from o 
+        in_ Order
+        order_by o.name
+        select o.name
+      }
+    ordered_names.should == expected_output 
+   end
+  end
 
   describe "in" do
     it "should retrive all object" do

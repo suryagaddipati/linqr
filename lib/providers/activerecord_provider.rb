@@ -7,8 +7,8 @@ class ActiveRecord::Base
   def self.evaluate_exp(linq_exp)
     #raise "Not an active-record class" if self.table_name
     query_params = {}
+    evaluator = ActiveRecordExpressionEvaluator.new(linq_exp)
     if (linq_exp.where?)
-      evaluator = ActiveRecordExpressionEvaluator.new(linq_exp)
       linq_exp.where.visit(evaluator)
       query_params.merge!(:conditions =>evaluator.conditions)
     end
@@ -16,6 +16,9 @@ class ActiveRecord::Base
     group_by_evaluator = ArGroupByExpressionEvaluator.new(linq_exp)
     if(linq_exp.group_by?)
       query_params.merge!(:group =>linq_exp.group_by.visit(group_by_evaluator))
+    end
+    if(linq_exp.order_by?)
+      query_params.merge!(:order =>linq_exp.order_by.visit(evaluator))
     end
 
     selected_values = self.find(:all,query_params)
