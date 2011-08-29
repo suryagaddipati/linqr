@@ -1,21 +1,42 @@
 require 'active_record'
+require 'group_by'
 require 'providers/enumerable_provider'
+require 'expression_evaluator_base'
 class ActiveRecord::Base
 
-  def evaluate_exp(linq_exp)
+  def self.evaluate_exp(linq_exp)
     #raise "Not an active-record class" if self.table_name
-    evaluator = ActiveRecordExpressionEvaluator.new(linq_exp)
-    linq_exp.where.visit(evaluator)
-    selected_values = self.class.find(:all, :conditions => evaluator.conditions)
-    selected_values.collect do |e|
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
+    query_params = {}
+    if (linq_exp.where?)
+      evaluator = ActiveRecordExpressionEvaluator.new(linq_exp)
+      linq_exp.where.visit(evaluator)
+      query_params.merge!(:conditions =>evaluator.conditions)
+    end
+
+    group_by_evaluator = ArGroupByExpressionEvaluator.new(linq_exp)
+    if(linq_exp.group_by?)
+      query_params.merge!(:group =>linq_exp.group_by.visit(group_by_evaluator))
+    end
+
+    selected_values = self.find(:all,query_params)
+
+    if (linq_exp.group_by?)
+      grouped_values = selected_values.group_by(&group_by_evaluator.group_by)
+      grouped_values.collect do |(k,v)|
+        Object.send(:define_method,group_by_evaluator.grouping_var) { GroupBy.new(k,v) }
       linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+      end
+    else 
+      selected_values.collect do |e|
+        Object.send(:define_method,linq_exp.variable.to_sym) { e }
+        linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+      end
     end
   end
 end
 
 
-class ActiveRecordExpressionEvaluator
+class ActiveRecordExpressionEvaluator < ExpressionEvaluator
   attr_reader :conditions
   def initialize(linq_exp)
     @binding = linq_exp.binding
@@ -62,4 +83,13 @@ class ActiveRecordExpressionEvaluator
     binary_exp.visit(self)
   end
 
+end
+
+class ArGroupByExpressionEvaluator < ActiveRecordExpressionEvaluator
+  attr_reader :grouping_var , :group_by
+  def visit_hash(node)
+    @grouping_var = node.first.value.visit(self)
+    @group_by = node.first.key.visit(self)
+    @group_by
+  end
 end

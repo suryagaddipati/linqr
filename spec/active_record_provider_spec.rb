@@ -23,17 +23,34 @@ describe "ActiveRecord Provider" do
     Order.create(:name => "second")
     second_order = Order.find(:all , :conditions => {:name => "second"})
 
-    orders = Order.new #change this to order
     output =  _{ 
       from o
-      in_  orders
+      in_  Order
       where o.name == "second"
       select o
 
     }
     output.should == second_order
   end
-  
+  describe "group_by" do
+    it "should group by the attribute" do 
+      Order.create(:name => "first")
+      Order.create(:name => "second")
+      Order.create(:name => "second")
+      Order.create(:name => "third")
+
+    expected_grouped_orders = Order.find(:all , :group => :name)
+
+    grouped_by_name = _{
+        from o 
+        in_ Order
+        group_by o.name   => :g
+        select :name => g.key , :orders => g.values
+      }
+    grouped_by_name.collect(&:name).should == ["first", "second", "third"]
+    end
+  end
+
   describe "in" do
     it "should retrive all object" do
       Order.create(:name => "first")
@@ -42,10 +59,10 @@ describe "ActiveRecord Provider" do
 
 
     first_second = Order.find(:all , :conditions => {:name => ["second", "first"]})
-      orders = Order.new #change this to order
+
       output =  _{ 
         from o
-        in_  orders
+        in_ Order
         where ["second", "first"].member?(o.name)
         select o
       }

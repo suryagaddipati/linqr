@@ -1,5 +1,5 @@
 require 'expression_evaluator_base'
-GroupBy = Struct.new(:key,:values)
+require 'group_by'
 module  Enumerable
 
   def handle_hash(linq_exp)
@@ -46,7 +46,7 @@ module  Enumerable
 
     grouped_values.collect do |(k,v)|
       Object.send(:define_method,group_by_evaluator.grouping_var) { GroupBy.new(k,v) }
-    linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+      linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
 
