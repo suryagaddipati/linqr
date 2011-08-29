@@ -18,9 +18,9 @@ source instead of learning a whole new api.
       from x
       in_ numbers
       where (x == 3 ||  x == 5 || x == 8) && ( x % 2) == 0
-      select x
+      select x * 3
     }
-    output.should == [8]
+    output.should == [24]
 
 * Quering a hash
 
@@ -39,7 +39,7 @@ source instead of learning a whole new api.
     number_groups = _{
       from n 
       in_ numbers
-      where x > 3 && x < 100
+      where n > 3 && n < 100
       group_by n % 5  => :g
       select :remainder => g.key , :values => g.values
     }
@@ -72,13 +72,13 @@ source instead of learning a whole new api.
 === Querying ActiveRecord Models
  All the examples listed for enumerable should work with activerecord models too
 
-  output =  _{·
-  from o
-  in_  Order 
-  where o.name == "second"
-  select o
-  }
-  output.should == second_order
+    grouped_by_name = _{
+        from o 
+        in_ Order
+        order_by o.name
+        group_by o.name   => :g
+        select :name => g.key , :orders => g.values
+      }
 
 === Querying Groupon Api
     output =  _{·
