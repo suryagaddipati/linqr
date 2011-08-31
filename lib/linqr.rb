@@ -2,7 +2,6 @@ require 'providers/enumerable_provider'
 require 'providers/activerecord_provider'
 require 'providers/groupon_provider'
 require 'linqr_exp'
-$:.unshift File.join(File.dirname(__FILE__), '..','ripper2ruby', 'lib')
 require 'ripper2ruby'
 class Ruby::Node
   def visit(visitor)
