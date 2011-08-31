@@ -94,7 +94,13 @@ class EnumerableExpessionEvaluator < ExpressionEvaluator
 
   def visit_call(node)
     target = node.target.visit(self)
-    target.send(node.identifier.to_sym)
+    method_name = node.identifier ? node.identifier.to_sym : :[]
+    if (node.arguments)
+      arguments = node.arguments.collect { |x| x.visit(self) }
+      target.send(method_name, *arguments)
+    else
+      target.send(method_name)
+    end
   end
 end
 

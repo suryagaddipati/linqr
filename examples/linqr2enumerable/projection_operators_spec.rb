@@ -1,0 +1,35 @@
+require 'linqr'
+describe "Projection operators" do
+  it "Simple 1" do 
+    numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+    output =  _{ 
+      from n
+      in_ numbers
+      select n + 1
+    }
+    output.should == [6, 5, 2, 4, 10, 9, 7, 8, 3, 1]
+  end
+
+  it  "Simple 2" do
+    Product = Struct.new(:name, :price)
+    products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
+    
+    product_names = _{
+      from p
+      in_ products 
+      select p.name
+    }
+    product_names.should == ["shoes","glasses","pencil"]
+  end
+
+  it  "Select - Transformation" do
+    numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
+    strings = [ "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" ]
+    text_nums = _{
+      from n
+      in_ numbers
+      select strings[n]
+    }
+    text_nums.should == ["five", "four", "one", "three", "nine", "eight", "six", "seven", "two", "zero"]
+  end
+end
