@@ -15,7 +15,7 @@ class LinqrExp
   end
 
   def evaluate 
-    source.evaluate(self)
+    source.linqr_provider.evaluate(self)
   end
 
   def variable

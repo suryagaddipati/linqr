@@ -1,6 +1,6 @@
 require 'providers/enumerable_provider'
-require 'providers/activerecord_provider'
-require 'providers/groupon_provider'
+require 'providers/active_record/activerecord_provider'
+require 'providers/groupon/groupon_provider'
 require 'linqr_exp'
 require 'ripper2ruby'
 class Ruby::Node
