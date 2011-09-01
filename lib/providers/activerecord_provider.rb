@@ -3,9 +3,11 @@ require 'group_by'
 require 'providers/enumerable_provider'
 require 'expression_evaluator_base'
 class ActiveRecord::Base
+  def self.linqr_provider
+    self
+  end
 
-  def self.evaluate_exp(linq_exp)
-    #raise "Not an active-record class" if self.table_name
+  def self.evaluate(linq_exp)
     query_params = {}
     evaluator = ActiveRecordExpressionEvaluator.new(linq_exp)
     if (linq_exp.where?)

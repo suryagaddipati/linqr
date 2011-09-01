@@ -1,42 +1,26 @@
 require 'expression_evaluator_base'
 require 'group_by'
 module  Enumerable
-
-  def handle_hash(linq_exp)
+  def handle_where(linq_exp)
+    if (self.is_a? Hash)
       filtered_values = self.select do|k,v| 
         Object.send(:define_method,linq_exp.variables[0].to_sym) { k }
         Object.send(:define_method,linq_exp.variables[1].to_sym) { v }
         linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
       end
-
-      filtered_values.collect do |k,v|
-        Object.send(:define_method,linq_exp.variables[0].to_sym) { k }
-        Object.send(:define_method,linq_exp.variables[1].to_sym) { v }
-        linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+    else
+      self.select do|e| 
+        Object.send(:define_method,linq_exp.variable.to_sym) { e }
+        linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
       end
-  end
-
-  def handle_where(linq_exp)
-    return self unless linq_exp.where?
-    self.select do|e| 
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
-      linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
   def handle_order_by(linq_exp,filtered_values)
-    return filtered_values unless linq_exp.order_by?
     filtered_values.sort_by do|e| 
       Object.send(:define_method,linq_exp.variable.to_sym) { e }
       linq_exp.order_by.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
-  def handle_select(linq_exp,filtered_values)
-    filtered_values.collect do |e|
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
-      linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end
-  end
-
   def handle_group_by(linq_exp,filtered_values)
     group_by_evaluator = GroupByExpressionEvaluator.new(linq_exp)
     grouped_values = filtered_values.group_by do |e|
@@ -50,21 +34,37 @@ module  Enumerable
     end
   end
 
-  def evaluate_exp(linq_exp)
+  def handle_select(linq_exp,filtered_values)
     if (self.is_a? Hash)
-      handle_hash(linq_exp)
-    else
-      filtered_values = handle_where(linq_exp)
-      filtered_values = handle_order_by(linq_exp,filtered_values)
-      if (linq_exp.group_by?)
-        handle_group_by(linq_exp,filtered_values)
-      else
-        handle_select(linq_exp,filtered_values)
+      filtered_values.collect do |k,v|
+        Object.send(:define_method,linq_exp.variables[0].to_sym) { k }
+        Object.send(:define_method,linq_exp.variables[1].to_sym) { v }
+        linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
       end
-
+    else
+      filtered_values.collect do |e|
+        Object.send(:define_method,linq_exp.variable.to_sym) { e }
+        linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+      end
     end
-
   end
+
+
+  def linqr_provider
+    self
+  end
+
+  def evaluate (linq_exp)
+    provider = self.linqr_provider
+    filtered_values =linq_exp.where?? provider.handle_where(linq_exp) : self
+    filtered_values = linq_exp.order_by?? provider.handle_order_by(linq_exp,filtered_values) : filtered_values
+    if (linq_exp.group_by?)
+      provider.handle_group_by(linq_exp,filtered_values)
+    else
+      provider.handle_select(linq_exp,filtered_values)
+    end
+  end
+
 end
 
 

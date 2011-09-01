@@ -13,8 +13,9 @@ class LinqrExp
     @exp = Ripper::RubyBuilder.build(proc_exp.to_source)
     @binding = proc_exp.binding
   end
+
   def evaluate 
-    source.evaluate_exp(self)
+    source.evaluate(self)
   end
 
   def variable

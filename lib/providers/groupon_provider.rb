@@ -2,7 +2,7 @@ require 'groupon'
 require 'expression_evaluator_base'
 class GrouponDeals
 
-  def self.evaluate_exp(linq_exp)
+  def self.evaluate(linq_exp)
     Groupon.api_key = '966a0273f2974c725e25d507d4e07daabcb0ee00'
     evaluator = GrouponExpressionEvaluator.new(linq_exp)
     linq_exp.where.visit(evaluator)
