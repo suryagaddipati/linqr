@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "linqr" do
   it "simple binary expression" do 
     numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    output =  _{ 
+    output =  __{ 
       from x
       in_ numbers
       where x > 1
@@ -13,7 +13,7 @@ describe "linqr" do
   end
   it"a little complex binary expression"do 
     numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    output =  _{ 
+    output =  __{ 
       from x
       in_ numbers
       where (x % 2) > 0
@@ -23,7 +23,7 @@ describe "linqr" do
   end
   it"compound 'or'  binary expression"do 
     numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    output =  _{ 
+    output =  __{ 
       from x
       in_ numbers
       where (x == 3 ||  x == 5 || x == 8) && ( x % 2) == 0
@@ -33,7 +33,7 @@ describe "linqr" do
   end
   it"compound 'and'  binary expression"do 
     numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    output =  _{ 
+    output =  __{ 
       from x
       in_ numbers
       where x > 3 && x <= 5
@@ -44,7 +44,7 @@ describe "linqr" do
 
   it "query associative array" do
     hash = {:a => 1 , :b => 2 , :c => 3}
-    output = _{
+    output = __{
       from k,v
       in_ hash
       where v == 3
@@ -57,7 +57,7 @@ describe "linqr" do
     Product = Struct.new(:name, :price)
     products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
     
-    cheap_product_names = _{
+    cheap_product_names = __{
       from p
       in_ products 
       where p.price < 10
@@ -71,7 +71,7 @@ describe "linqr" do
     Product = Struct.new(:name, :price)
     products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
     
-    cheap_product_names = _{
+    cheap_product_names = __{
       from p
       in_ products 
       where p.price < 10
@@ -86,15 +86,15 @@ describe "linqr" do
   context "group by" do
     it "simple-1" do
       numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-      number_groups = _{
+      number_groups = __{
         from n 
         in_ numbers
-        where x > 3 && x < 100
+        where n > 3 && n < 100
         group_by n % 5  => :g
         select :remainder => g.key , :values => g.values
       }
 
-      number_groups.collect(&:remainder).should == [0, 4, 1, 3, 2]
+      number_groups.collect(&:remainder).should == [0, 4, 3, 1, 2]
     end
   end
 
@@ -102,7 +102,7 @@ describe "linqr" do
 
    it "should order by the order by operator" do
       words = [ "cherry", "apple", "blueberry" ]
-      sorted_words = _{
+      sorted_words = __{
         from word 
         in_ words
         order_by word
@@ -113,7 +113,7 @@ describe "linqr" do
    
    it "simple-2" do
       words = [ "cherry", "apple", "blueberry" ]
-      sorted_words = _{
+      sorted_words = __{
         from word 
         in_ words
         order_by word.length

@@ -1,29 +1,24 @@
 require 'providers/enumerable_expression_evaluator'
+require 'lazy_enumerator'
 require 'group_by'
 class EnumerableProvider
   def initialize(enumerable)
-    @enumerable = enumerable
+    @enumerable = enumerable.to_enum
   end
   def handle_where(linq_exp)
-    if (@enumerable.is_a? Hash)
-      filtered_values = @enumerable.select do|k,v| 
-        Object.send(:define_method,linq_exp.variables[0].to_sym) { k }
-        Object.send(:define_method,linq_exp.variables[1].to_sym) { v }
-        linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
-      end
-    else
-      @enumerable.select do|e| 
+      @enumerable.lazy_select do|e| 
         Object.send(:define_method,linq_exp.variable.to_sym) { e }
         linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
       end
-    end
   end
+
   def handle_order_by(linq_exp,filtered_values)
-    filtered_values.sort_by do|e| 
+    filtered_values.lazy_sort_by do|e| 
       Object.send(:define_method,linq_exp.variable.to_sym) { e }
       linq_exp.order_by.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
+
   def handle_group_by(linq_exp,filtered_values)
     group_by_evaluator = GroupByExpressionEvaluator.new(linq_exp)
     grouped_values = filtered_values.group_by do |e|
@@ -38,17 +33,9 @@ class EnumerableProvider
   end
 
   def handle_select(linq_exp,filtered_values)
-    if (@enumerable.is_a? Hash)
-      filtered_values.collect do |k,v|
-        Object.send(:define_method,linq_exp.variables[0].to_sym) { k }
-        Object.send(:define_method,linq_exp.variables[1].to_sym) { v }
-        linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
-      end
-    else
-      filtered_values.collect do |e|
-        Object.send(:define_method,linq_exp.variable.to_sym) { e }
-        linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
-      end
+    filtered_values.lazy_map do |e|
+      Object.send(:define_method,linq_exp.variable.to_sym) { e }
+      linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
 
@@ -68,4 +55,3 @@ module  Enumerable
     EnumerableProvider.new(self)
   end
 end
-

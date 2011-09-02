@@ -9,7 +9,7 @@ class LinqrExp
 
 
   attr_reader :binding
-  def initialize(&proc_exp)
+  def initialize(proc_exp)
     @exp = Ripper::RubyBuilder.build(proc_exp.to_source)
     @binding = proc_exp.binding
   end
