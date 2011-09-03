@@ -7,13 +7,33 @@ require 'linqr_exp'
 require 'ripper2ruby'
 class Ruby::Node
   def visit(visitor)
-    visitor.send("visit_#{self.class.name.split('::')[1].downcase}".to_sym, self)
+    class_name=self.class.name.split('::').size == 2 ? self.class.name.split('::')[1]: self.class.name
+    visitor.send("visit_#{class_name.downcase}".to_sym, self)
   end
   def evaluate_source(visitor)
     visitor.send("source_name_#{self.class.name.split('::')[1].downcase}".to_sym, self)
   end
   def to_sym
     to_ruby.to_sym
+  end
+end
+
+class OrderBy < Ruby::Node
+  def initialize(node)
+    @node = node
+  end
+  def expression
+    return @node.arg.first.key if @node.arg.is_a? Ruby::Hash
+    @node
+  end
+  def descending?
+    @node.arg.is_a? Ruby::Hash
+  end
+end
+
+class GroupBy < OrderBy
+  def grouping_var
+    @node.arg.first.value.first.to_sym
   end
 end
 

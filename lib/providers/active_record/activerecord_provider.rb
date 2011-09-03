@@ -27,7 +27,7 @@ class ActiveRecordProvider
     if (linq_exp.group_by?)
       grouped_values = selected_values.group_by(&group_by_evaluator.group_by)
       grouped_values.collect do |(k,v)|
-        Object.send(:define_method,group_by_evaluator.grouping_var) { GroupBy.new(k,v) }
+        Object.send(:define_method,group_by_evaluator.grouping_var) { Grouped.new(k,v) }
       linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
       end
     else 

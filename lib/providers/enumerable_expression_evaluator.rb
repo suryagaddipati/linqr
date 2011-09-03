@@ -1,6 +1,14 @@
 require 'ostruct'
 require 'expression_evaluator_base'
 class EnumerableExpessionEvaluator < ExpressionEvaluator
+  def visit_orderby(node)
+    node.expression.visit(self)
+  end
+
+  def visit_groupby(node)
+    node.expression.visit(self)
+  end
+
   def visit_hash(node)
     record = OpenStruct.new
     node.elements.each do |e|
@@ -35,10 +43,3 @@ class EnumerableExpessionEvaluator < ExpressionEvaluator
   end
 end
 
-class GroupByExpressionEvaluator < EnumerableExpessionEvaluator 
-  attr_reader :grouping_var
-  def visit_hash(node)
-    @grouping_var = node.first.value.visit(self)
-    node.first.key.visit(self)
-  end
-end

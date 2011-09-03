@@ -90,7 +90,7 @@ describe "linqr" do
         from n 
         in_ numbers
         where n > 3 && n < 100
-        group_by n % 5  => :g
+        group_by n % 5  => g
         select :remainder => g.key , :values => g.values
       }
 
@@ -98,29 +98,4 @@ describe "linqr" do
     end
   end
 
-  describe "order by" do
-
-   it "should order by the order by operator" do
-      words = [ "cherry", "apple", "blueberry" ]
-      sorted_words = __{
-        from word 
-        in_ words
-        order_by word
-        select word
-      }
-      sorted_words.should ==  ["apple", "blueberry","cherry" ]
-   end
-   
-   it "simple-2" do
-      words = [ "cherry", "apple", "blueberry" ]
-      sorted_words = __{
-        from word 
-        in_ words
-        order_by word.length
-        select word
-      }
-      sorted_words.should == ["apple", "cherry", "blueberry"]
-
-   end
-  end
 end

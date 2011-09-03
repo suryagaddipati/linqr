@@ -1,1 +1,1 @@
-GroupBy = Struct.new(:key,:values)
+Grouped = Struct.new(:key,:values)

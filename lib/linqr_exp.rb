@@ -2,9 +2,25 @@ require 'sourcify'
 require 'ripper'
 class LinqrExp
 
- %w(where group_by from select order_by).each do | q |
+ %w(where from select).each do | q |
    send(:define_method,q.to_sym) { fexp(@exp,q) }
    send(:define_method,(q+"?").to_sym) {!fcall(@exp,q).nil?}
+ end
+ 
+ def group_by
+   GroupBy.new(fexp(@exp,"group_by")) 
+ end
+
+ def group_by?
+   !fcall(@exp,"group_by").nil?
+ end
+
+ def order_by
+   OrderBy.new(fexp(@exp,"order_by")) 
+ end
+
+ def order_by?
+   !fcall(@exp,"order_by").nil?
  end
 
 
