@@ -22,16 +22,22 @@ class OrderBy < Ruby::Node
   def initialize(node)
     @node = node
   end
+  def expressions
+    descending?? [@node.arguments.first.arg.first.key]: @node.arguments
+  end
+  def descending?
+    @node.arguments.first.arg.is_a? Ruby::Hash
+  end
+end
+
+class GroupBy < Ruby::Node
+  def initialize(node)
+    @node = node
+  end
   def expression
     return @node.arg.first.key if @node.arg.is_a? Ruby::Hash
     @node
   end
-  def descending?
-    @node.arg.is_a? Ruby::Hash
-  end
-end
-
-class GroupBy < OrderBy
   def grouping_var
     @node.arg.first.value.first.to_sym
   end

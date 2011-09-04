@@ -16,7 +16,7 @@ class LinqrExp
  end
 
  def order_by
-   OrderBy.new(fexp(@exp,"order_by")) 
+   OrderBy.new(fcall(@exp,"order_by")) 
  end
 
  def order_by?

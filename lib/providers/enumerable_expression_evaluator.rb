@@ -1,9 +1,6 @@
 require 'ostruct'
 require 'expression_evaluator_base'
 class EnumerableExpessionEvaluator < ExpressionEvaluator
-  def visit_orderby(node)
-    node.expression.visit(self)
-  end
 
   def visit_groupby(node)
     node.expression.visit(self)
@@ -17,6 +14,10 @@ class EnumerableExpessionEvaluator < ExpressionEvaluator
       record.send("#{key.to_s}=".to_sym,value)
     end
     record
+  end
+
+  def visit_argslist(node)
+    node.map {|arg| arg.visit(self)}
   end
 
   def visit_binary(node)

@@ -13,10 +13,13 @@ class EnumerableProvider
   end
 
   def handle_order_by(linq_exp,filtered_values)
-    sorted_values = filtered_values.lazy_sort_by do|e| 
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
-      sort_val = linq_exp.order_by.visit(EnumerableExpessionEvaluator.new(linq_exp))
-      linq_exp.order_by.descending?? 1 - sort_val : sort_val
+    order_by = linq_exp.order_by
+    order_by.expressions.reduce(filtered_values) do |values, sort_exp|
+      values.lazy_sort_by do|e| 
+        Object.send(:define_method,linq_exp.variable.to_sym) { e }
+        sort_val = sort_exp.visit(EnumerableExpessionEvaluator.new(linq_exp))
+        order_by.descending?? 1 - sort_val : sort_val
+      end
     end
   end
 
