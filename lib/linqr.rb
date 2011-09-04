@@ -18,15 +18,21 @@ class Ruby::Node
   end
 end
 
-class OrderBy < Ruby::Node
+class OrderBy
   def initialize(node)
     @node = node
   end
+
   def expressions
-    descending?? [@node.arguments.first.arg.first.key]: @node.arguments
+    descending?? (@node.arguments[0...-1] << last_arg.first.key): @node.arguments
   end
+
   def descending?
-    @node.arguments.first.arg.is_a? Ruby::Hash
+    last_arg.is_a? Ruby::Hash
+  end
+
+  def last_arg
+    @node.arguments.last.arg
   end
 end
 

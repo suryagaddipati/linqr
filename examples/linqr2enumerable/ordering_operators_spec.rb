@@ -34,7 +34,7 @@ describe "order by" do
     }
     desc_doubles.should == [4.1, 2.9, 2.3, 1.9, 1.7]
   end
-  it "then-by" do
+  it "then-by-descending" do
     products = [Item.new("bag", 9.00,5.00),Item.new("shoes", 5.00,2.00), Item.new("apple", 5.00,4.00), Item.new("cup", 25.00,14.00)]
      __{
       from p 
@@ -42,5 +42,15 @@ describe "order by" do
       order_by  p.price, p.discount_price
       select p
     }.collect(&:name).should == ["shoes","apple", "bag", "cup"] 
+  end
+
+  it "then-by" do
+    products = [Item.new("bag", 9.00,5.00),Item.new("apple", 5.00,2.00), Item.new("shoes", 5.00,4.00), Item.new("cup", 25.00,5.00)]
+     __{
+      from p 
+      in_ products
+      order_by  p.price, p.discount_price => descending
+      select p
+    }.collect(&:name).should == ["cup","bag","shoes","apple"] 
   end
 end
