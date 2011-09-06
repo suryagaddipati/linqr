@@ -17,6 +17,22 @@ class Ruby::Node
     to_ruby.to_sym
   end
 end
+class Ruby::Arg
+  def name
+    arg.name
+  end
+end
+class Ruby::Call
+  def name
+    identifier.to_s
+  end
+end
+class Ruby::Variable
+  def name
+    to_s
+  end
+end
+
 
 class OrderBy
   def initialize(node)

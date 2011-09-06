@@ -38,7 +38,7 @@ class LinqrExp
     variables.first
   end
   def variables
-    fcall(@exp,"from").arguments.collect{|a|a.arg.to_s}
+    fcall(@exp,"from").arguments.collect(&:name)
   end
   def fcall(exp, fname)
     exp.select(Ruby::Call).select {|call|call.identifier &&  call.token == fname}.first

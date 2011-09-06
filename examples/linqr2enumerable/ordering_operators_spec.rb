@@ -5,8 +5,7 @@ describe "order by" do
   it "should order by the order by operator" do
     words = [ "cherry", "apple", "blueberry" ]
     sorted_words = __{
-      from word 
-      in_ words
+      from word in_ words
       order_by word
       select word
     }
