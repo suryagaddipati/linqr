@@ -1,5 +1,6 @@
 require 'sourcify'
 require 'ripper'
+require 'source_name_evaluator'
 class LinqrExp
 
  %w(where from select).each do | q |
@@ -50,16 +51,10 @@ class LinqrExp
     f_arg # make this less confusing
   end
   def source
-    token = fcall(@exp,"in_").select(Ruby::Arg).first.arg
-    source_name = token.evaluate_source(self)
+    token =fcall(@exp,"in_").arguments.first
+    source_name = token.evaluate_source_name(SourceNameEvaluator.new)
     @binding.eval(source_name)
   end
 
 
-  def source_name_const(node)
-    node.identifier.to_s
-  end
-  def source_name_variable(node)
-    node.token.to_s
-  end
 end

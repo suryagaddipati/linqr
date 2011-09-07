@@ -10,26 +10,11 @@ class Ruby::Node
     class_name=self.class.name.split('::').size == 2 ? self.class.name.split('::')[1]: self.class.name
     visitor.send("visit_#{class_name.downcase}".to_sym, self)
   end
-  def evaluate_source(visitor)
+  def evaluate_source_name(visitor)
     visitor.send("source_name_#{self.class.name.split('::')[1].downcase}".to_sym, self)
   end
   def to_sym
     to_ruby.to_sym
-  end
-end
-class Ruby::Arg
-  def name
-    arg.name
-  end
-end
-class Ruby::Call
-  def name
-    identifier.to_s
-  end
-end
-class Ruby::Variable
-  def name
-    to_s
   end
 end
 
