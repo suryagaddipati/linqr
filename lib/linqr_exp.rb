@@ -7,7 +7,20 @@ class LinqrExp
    send(:define_method,q.to_sym) { fexp(@exp,q) }
    send(:define_method,(q+"?").to_sym) {!fcall(@exp,q).nil?}
  end
- 
+
+ def set_variable(name,val)
+   @variables ||= {}
+   @variables[name] =val
+ end
+
+ def variable_val(var_name)
+   if (@variables && var = @variables[var_name])
+     var
+   else
+    @binding.eval(var_name)
+   end
+ end
+
  def group_by
    GroupBy.new(fexp(@exp,"group_by")) 
  end

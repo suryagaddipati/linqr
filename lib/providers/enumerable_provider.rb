@@ -6,9 +6,10 @@ class EnumerableProvider
     @enumerable = enumerable.to_enum
   end
   def handle_where(linq_exp)
-      @enumerable.lazy_select do|e| 
-        Object.send(:define_method,linq_exp.variable.to_sym) { e }
-        linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
+    evaluator = EnumerableExpessionEvaluator.new(linq_exp)
+      @enumerable.lazy_select do|e|
+        linq_exp.set_variable(linq_exp.variable.to_s,e)
+        linq_exp.where.visit(evaluator)
       end
   end
 
@@ -16,7 +17,7 @@ class EnumerableProvider
     order_by = linq_exp.order_by
     order_by.expressions.reduce(filtered_values) do |values, sort_exp|
       values.lazy_sort_by do|e| 
-        Object.send(:define_method,linq_exp.variable.to_sym) { e }
+        linq_exp.set_variable(linq_exp.variable.to_s,e)
         sort_val = sort_exp.visit(EnumerableExpessionEvaluator.new(linq_exp))
         order_by.descending?? 1 - sort_val : sort_val
       end
@@ -25,19 +26,19 @@ class EnumerableProvider
 
   def handle_group_by(linq_exp,filtered_values)
     grouped_values = filtered_values.group_by do |e|
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
+      linq_exp.set_variable(linq_exp.variable.to_s,e)
       linq_exp.group_by.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
 
     grouped_values.collect do |(k,v)|
-      Object.send(:define_method,linq_exp.group_by.grouping_var) { Grouped.new(k,v) }
+      linq_exp.set_variable(linq_exp.group_by.grouping_var.to_s, Grouped.new(k,v) )
       linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end
 
   def handle_select(linq_exp,filtered_values)
     filtered_values.lazy_map do |e|
-      Object.send(:define_method,linq_exp.variable.to_sym) { e }
+      linq_exp.set_variable(linq_exp.variable.to_s,e)
       linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
     end
   end

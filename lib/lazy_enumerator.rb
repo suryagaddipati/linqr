@@ -16,15 +16,16 @@ class Enumerator
     Enumerator.new do |yielder| 
       self.each do |val| 
         yielder.yield(val) if block.call(val) 
-      end 
-    end 
-  end 
+      end
+    end
+  end
+
   def lazy_map(&block)
     Enumerator.new do |yielder| 
       self.each do |value| 
         yielder.yield(block.call(value))
-      end 
-    end 
+      end
+    end
   end
-end 
+end
 

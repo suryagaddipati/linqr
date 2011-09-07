@@ -1,7 +1,7 @@
 class ExpressionEvaluator
 
   def initialize(linq_exp)
-    @binding = linq_exp.binding
+    @linq_exp = linq_exp
   end
 
   def visit_symbol(node)
@@ -9,7 +9,7 @@ class ExpressionEvaluator
   end
 
   def visit_variable(node)
-    @binding.eval(node.to_s)
+    @linq_exp.variable_val(node.to_s)
   end
 
   def visit_integer(node)
