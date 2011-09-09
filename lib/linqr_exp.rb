@@ -8,9 +8,20 @@ class LinqrExp
    send(:define_method,(q+"?").to_sym) {!fcall(@exp,q).nil?}
  end
 
- def set_variable(name,val)
+ def with_vars
    @variables ||= {}
-   @variables[name] =val
+   Proc.new do |args|
+     args= [args] unless args.is_a? Array
+     args.each_with_index do |param, idx|
+       @variables[variables[idx].to_s]= param
+     end
+     yield *args
+   end
+ end
+
+ def set_variable(var,val)
+   @variables ||= {}
+   @variables[var] = val
  end
 
  def variable_val(var_name)

@@ -7,28 +7,25 @@ class EnumerableProvider
   end
   def handle_where(linq_exp)
     evaluator = EnumerableExpessionEvaluator.new(linq_exp)
-      @enumerable.lazy_select do|e|
-        linq_exp.set_variable(linq_exp.variable.to_s,e)
+      @enumerable.lazy_select(&linq_exp.with_vars do|e|
         linq_exp.where.visit(evaluator)
-      end
+      end)
   end
 
   def handle_order_by(linq_exp,filtered_values)
     order_by = linq_exp.order_by
     order_by.expressions.reduce(filtered_values) do |values, sort_exp|
-      values.lazy_sort_by do|e| 
-        linq_exp.set_variable(linq_exp.variable.to_s,e)
+      values.lazy_sort_by(&linq_exp.with_vars do|e| 
         sort_val = sort_exp.visit(EnumerableExpessionEvaluator.new(linq_exp))
         order_by.descending?? 1 - sort_val : sort_val
-      end
+      end)
     end
   end
 
   def handle_group_by(linq_exp,filtered_values)
-    grouped_values = filtered_values.group_by do |e|
-      linq_exp.set_variable(linq_exp.variable.to_s,e)
+    grouped_values = filtered_values.group_by(&linq_exp.with_vars do |e|
       linq_exp.group_by.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end
+    end)
 
     grouped_values.collect do |(k,v)|
       linq_exp.set_variable(linq_exp.group_by.grouping_var.to_s, Grouped.new(k,v) )
@@ -37,10 +34,9 @@ class EnumerableProvider
   end
 
   def handle_select(linq_exp,filtered_values)
-    filtered_values.lazy_map do |e|
-      linq_exp.set_variable(linq_exp.variable.to_s,e)
+    filtered_values.lazy_map(&linq_exp.with_vars do |e|
       linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end
+    end)
   end
 
   def evaluate (linq_exp)
