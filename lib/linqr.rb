@@ -1,8 +1,6 @@
 $:.unshift(File.expand_path(File.dirname(__FILE__)))
 require 'providers/enumerable_provider'
 require 'providers/hash_provider'
-require 'providers/active_record/activerecord_provider'
-require 'providers/groupon/groupon_provider'
 require 'linqr_exp'
 require 'ripper2ruby'
 class Ruby::Node

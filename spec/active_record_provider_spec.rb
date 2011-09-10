@@ -1,5 +1,6 @@
 require 'active_record'
 require 'linqr'
+require 'providers/active_record/activerecord_provider'
 require 'spec_helper'
 ENV['DB'] ||= "mysql"
 database_yml = File.expand_path('../database.yml', __FILE__)

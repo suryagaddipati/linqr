@@ -1,5 +1,6 @@
 require 'linqr'
 require 'spec_helper'
+require 'providers/groupon/groupon_provider'
 require 'awesome_print'
 
 describe 'Groupon provider' do 
