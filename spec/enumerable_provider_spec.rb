@@ -91,7 +91,7 @@ describe "linqr" do
         in_ numbers
         where n > 3 && n < 100
         group_by n % 5  => g
-        select :remainder => g.key , :values => g.values
+        select remainder: g.key , values: g.values
       }
 
       number_groups.collect(&:remainder).should == [0, 4, 3, 1, 2]
