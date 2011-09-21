@@ -8,6 +8,7 @@ require 'ripper/ruby_builder/token'
 require 'ripper/ruby_builder/stack'
 
 require 'erb/stripper'
+require 'sourcify'
 
 Dir[File.dirname(__FILE__) + '/ruby_builder/events/*.rb'].sort.each { |file| require file }
 
@@ -28,10 +29,10 @@ class Ripper
     end
 
     @@filters = [lambda { |src, file| file && File.extname(file) == '.erb' ? Erb::Stripper.new.to_ruby(src) : src }]
+     attr_reader :linqr_exp 
 
     class << self
       def build(src, filename = nil)
-        @linqr_exp = Ruby::Linqr::LinqrExp.new
         new(src, filename).parse
       end
 
@@ -39,9 +40,6 @@ class Ripper
         @@filters
       end
 
-      def linqr_exp
-        @linqr_exp
-      end
     end
 
     NEWLINE           = [:@nl, :@ignored_nl]
@@ -74,7 +72,9 @@ class Ripper
 
     attr_reader :src, :filename, :stack, :string_stack, :trailing_whitespace
 
-    def initialize(src, filename = nil, lineno = nil)
+    def initialize(proc_exp, filename = nil, lineno = nil)
+       src = proc_exp.to_source
+       @linqr_exp = Ruby::Linqr::LinqrExp.new(proc_exp.binding)
       @src = src ||= filename && File.read(filename) || ''
 
       @filename = filename
@@ -85,7 +85,7 @@ class Ripper
       src.gsub!(/([\s\n]*)\Z/) { |s| @trailing_whitespace = Ruby::Whitespace.new(s) and nil }
       src = filter(src, filename)
 
-      super
+      super src , filename, lineno
     rescue ArgumentError => e
       p filename
       raise e

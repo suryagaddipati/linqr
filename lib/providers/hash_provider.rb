@@ -1,18 +1,21 @@
 require 'providers/enumerable_provider'
 
 class HashProvider < EnumerableProvider
+  def evaluate (exp)
+    evaluator = EnumerableExpessionEvaluator.new(self)
+    from_clause = exp.from_clause
+    source = exp.source
+    out = []
+    source.each do |k,v|
+      define_var(from_clause.identifiers.first,k)
+      define_var(from_clause.identifiers[1],v)
+      out << exp.query_body.select_clause.visit(evaluator) if exp.query_body.where_clause.visit(evaluator)
+    end
 
-  def handle_where(linq_exp)
-    filtered_values = @enumerable.lazy_select(&linq_exp.with_vars do|k,v| 
-      linq_exp.where.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end)
+    out
   end
 
-  def handle_select(linq_exp,filtered_values)
-    filtered_values.lazy_map(&linq_exp.with_vars do |k,v|
-      linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
-    end)
-  end
+
 end
 
 class  Hash

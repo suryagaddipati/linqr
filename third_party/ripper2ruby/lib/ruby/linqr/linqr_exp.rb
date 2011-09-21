@@ -41,63 +41,80 @@
 module Ruby
   module Linqr
     class FromClause
-      attr_reader :from_generators
-      def initialize
-        @from_generators = []
-      end
-      def on_call(identifier)
-        call = Ruby::Call.new(nil, nil, identifier)
-        case identifier.to_sym
-        when :from
-          current_generator(call).from_call = call
-        when :in_
-          current_generator(call).in_call = call
-        end
-        call
+      attr_reader :from_call
+      def on_call(call)
+        unless(complete =  @from_call && @in_call)
+          case call.identifier.to_sym
+          when :from
+            @from_call = call
+          when :in_
+            @in_call = call
+          end
+        end 
+        complete
       end
 
-      def current_generator(call)
-        unmatched = @from_generators.select{|g| g.in_call == nil || g.from_call == nil}
-        if(unmatched.size == 0)
-          fg =  FromGenerator.new(call)
-          @from_generators << fg
-          fg
-        else 
-          unmatched.first
-        end
-      end
-    end 
-
-    class FromGenerator
-      #attr_accessor :identifier, :expression
-      attr_accessor :in_call , :from_call
       def identifiers
-        @from_call.arguments.collect(&:name)
+        @from_call.arguments.collect(&:name).collect(&:to_sym)
       end
       def expression
         token =@in_call.arguments.first
         token.evaluate_source_name(SourceNameEvaluator.new)
       end
+    end 
+    
+    class WhereClause < LinqrClause
+
+    end
+
+    class SelectClause < LinqrClause
+      
+
     end
 
 
+    class QueryBody
+      #from-or-where-clausesopt   orderby-clauseopt   select-or-group-clause   into-clauseopt
+      attr_accessor :from_clause, :where_clause , :select_clause , :into_clause 
+      attr_accessor :group_by_clause, :order_by_clause
+
+      def on_call(call)
+          clause = case call.identifier.to_sym
+                      when :from , :in_
+                        @from_clause ||= FromClause.new
+                      when :select
+                        @select_clause ||= SelectClause.new
+                      when :where
+                        @where_clause ||= WhereClause.new
+                      when :order_by
+                        @order_by_clause ||= OrderByClause.new
+                      when :group_by
+                        @group_by_clause ||= GroupByClause.new
+                      end
+         clause.on_call(call) unless clause.nil?
+      end
+
+    end
 
     class LinqrExp
       attr_accessor :from_clause, :query_body
-      def initialize
+      def initialize(binding)
         @from_clause = FromClause.new
+        @query_body = QueryBody.new
+        @binding = binding
       end
 
       def on_call(identifier)
-          case identifier.to_sym
-          when :order_by
-            Ruby::Linqr::OrderBy.new(nil, nil, identifier)
-          when :group_by
-            Ruby::Linqr::GroupBy.new(nil, nil, identifier)
-          else
-            @from_clause.on_call(identifier)
-          end
+        call = Ruby::Call.new(nil, nil, identifier)
+        @query_body.on_call(call) if( @from_clause.on_call(call))
+        call
       end
+
+      def source
+        source_name = self.from_clause.expression
+        @binding.eval(source_name)
+      end
+
     end
   end
 end

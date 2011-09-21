@@ -1,9 +1,9 @@
 require 'ruby/call'
 module Ruby
   module Linqr
-    class OrderBy < Ruby::Call
+    class OrderByClause < LinqrClause 
       def expressions
-        descending?? (self.arguments[0...-1] << last_arg.first.key): self.arguments
+        descending?? (@call.arguments[0...-1] << last_arg.first.key): @call.arguments
       end
 
       def descending?
@@ -11,7 +11,7 @@ module Ruby
       end
 
       def last_arg
-        self.arguments.last.arg
+        @call.arguments.last.arg
       end
     end
   end

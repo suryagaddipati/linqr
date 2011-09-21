@@ -20,7 +20,7 @@ class Ripper
       end
 
       def on_fcall(identifier)
-        Ripper::RubyBuilder.linqr_exp.on_call(identifier)
+        @linqr_exp.on_call(identifier)
       end
 
       # assignment methods, e.g. a.b = :c

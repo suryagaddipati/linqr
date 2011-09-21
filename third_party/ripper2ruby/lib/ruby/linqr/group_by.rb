@@ -1,16 +1,22 @@
-require 'ruby/call'
+require 'ruby/linqr/linqr_clause'
 module Ruby
   module Linqr
-    class GroupBy < Ruby::Call
+    class GroupByClause < LinqrClause
       def expression
-        return self.arg.first.key if self.arg.is_a? Ruby::Hash
-        self
+        return first_arg.first.key if first_arg.is_a? Ruby::Hash
+        @call
       end
       def grouping_var
-        self.arg.first.value.first.to_sym
+        first_arg.first.value.first.to_sym
       end
       def arg
-        self.arguments.first.arg
+        @call.arguments.first.arg
+      end
+      def visit(visitor)
+        visitor.visit_group_by(self)
+      end
+      def first_arg
+        @call.arguments.first.arg
       end
     end
   end

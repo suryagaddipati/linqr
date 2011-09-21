@@ -2,7 +2,7 @@ require 'ostruct'
 require 'expression_evaluator_base'
 class EnumerableExpessionEvaluator < ExpressionEvaluator
 
-  def visit_groupby(node)
+  def visit_group_by(node)
     node.expression.visit(self)
   end
 
