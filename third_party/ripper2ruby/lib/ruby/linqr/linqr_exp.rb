@@ -115,6 +115,10 @@ module Ruby
         @binding.eval(source_name)
       end
 
+      def variable_val(name)
+        @binding.eval(name)
+      end
+
     end
   end
 end

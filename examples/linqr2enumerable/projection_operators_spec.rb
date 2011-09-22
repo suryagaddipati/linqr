@@ -41,14 +41,14 @@ describe "Projection operators" do
       end
     end
 
-    plus_ones = _{
-      from n
-      where n < 5
-      in_ natural_numbers
-      select n 
-    }.take(4)
-    
-   plus_ones.to_a.should == [1,2,3,4] 
+#   plus_ones = _{
+#     from n
+#     where n < 5
+#     in_ natural_numbers
+#     select n 
+#   }.take(4)
+#   
+#  plus_ones.to_a.should == [1,2,3,4] 
 
   end
 end

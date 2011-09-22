@@ -9,7 +9,7 @@ class ExpressionEvaluator
   end
 
   def visit_variable(node)
-    @linq_exp.variable_val(node.to_s)
+    @linq_exp.variable_val(node.to_s) 
   end
 
   def visit_integer(node)

@@ -5,12 +5,15 @@ class EnumerableProvider
 
   attr_reader :variables
   def handle_order_by(linq_exp,filtered_values)
-    order_by = linq_exp.order_by
+    order_by = linq_exp.query_body.order_by_clause
+    filtered_values = filtered_values.to_enum #huh?
+    evaluator = EnumerableExpessionEvaluator.new(self)
     order_by.expressions.reduce(filtered_values) do |values, sort_exp|
-      values.lazy_sort_by(&linq_exp.with_vars do|e| 
-        sort_val = sort_exp.visit(EnumerableExpessionEvaluator.new(linq_exp))
+      values.lazy_sort_by do|e| 
+        define_var(linq_exp.from_clause.identifiers.first,e)
+        sort_val = sort_exp.visit(evaluator)
         order_by.descending?? 1 - sort_val : sort_val
-      end)
+      end
     end
   end
 
@@ -34,21 +37,27 @@ class EnumerableProvider
     @variables[var_name] = val
   end
   def variable_val(name)
-    @variables[name.to_sym]
+    @variables[name.to_sym]  || @exp.variable_val(name)
   end
   def evaluate (exp)
+    @exp = exp
     evaluator = EnumerableExpessionEvaluator.new(self)
     from_clause = exp.from_clause
     source = exp.source
     out = []
     source.each do |e|
       define_var(from_clause.identifiers.first,e)
-      if exp.query_body.where_clause.visit(evaluator)
-        out << (exp.query_body.group_by_clause ? e :  exp.query_body.select_clause.visit(evaluator))
+      if exp.query_body.where_clause
+        if exp.query_body.where_clause.visit(evaluator)
+          out << (exp.query_body.group_by_clause ? e :  exp.query_body.select_clause.visit(evaluator))
+        end
+      else
+        out << exp.query_body.select_clause.visit(evaluator)
       end
     end
 
-    exp.query_body.group_by_clause ? handle_group_by(exp,out):out 
+    out = exp.query_body.group_by_clause ? handle_group_by(exp,out):out 
+    exp.query_body.order_by_clause ? handle_order_by(exp,out) : out
   end
 end
 module  Enumerable
