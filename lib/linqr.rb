@@ -8,6 +8,8 @@ class Object
     exp = Ripper::RubyBuilder.new(proc_exp)
     exp.parse
     linqr_exp = exp.linqr_exp
-    linqr_exp.source.linqr_provider.evaluate(linqr_exp)
+    provider = linqr_exp.source.linqr_provider
+    linqr_exp.visit(provider)
+    #provider.evaluate(linqr_exp)
   end
 end

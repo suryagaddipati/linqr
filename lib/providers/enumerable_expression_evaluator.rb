@@ -20,6 +20,10 @@ class EnumerableExpessionEvaluator < ExpressionEvaluator
     node.map {|arg| arg.visit(self)}
   end
 
+  def visit_array(node)
+    node.elements.collect(&:arg).reduce([]){|out,n| out << variable_val(n) ; out}
+  end
+
   def visit_binary(node)
     right_val = node.right.visit(self)
     left_val = node.left.visit(self)

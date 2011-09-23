@@ -118,6 +118,9 @@ module Ruby
       def variable_val(name)
         @binding.eval(name)
       end
+      def visit(visitor)
+        visitor.visit_linqr_exp(self)
+      end
 
     end
   end

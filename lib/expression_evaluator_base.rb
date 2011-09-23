@@ -1,15 +1,11 @@
 class ExpressionEvaluator
 
-  def initialize(linq_exp)
-    @linq_exp = linq_exp
-  end
-
   def visit_symbol(node)
     node.value
   end
 
   def visit_variable(node)
-    @linq_exp.variable_val(node.to_s) 
+    variable_val(node.to_s) 
   end
 
   def visit_integer(node)
