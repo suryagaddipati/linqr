@@ -6,10 +6,22 @@ require 'ripper2ruby'
 class Object
   def _(&proc_exp)
     exp = Ripper::RubyBuilder.new(proc_exp)
-    exp.parse
-    linqr_exp = exp.linqr_exp
-    provider = linqr_exp.source.linqr_provider
-    linqr_exp.visit(provider)
-    #provider.evaluate(linqr_exp)
+    Thunk.new(exp)
+  end
+
+  class Thunk
+    include Enumerable
+    def initialize(exp)
+      @exp = exp
+    end
+    def evaluate_expression
+      @exp.parse
+      linqr_exp = @exp.linqr_exp
+      provider = linqr_exp.source.linqr_provider
+      linqr_exp.visit(provider)
+    end
+    def each(&blk)
+      evaluate_expression.each(&blk)
+    end
   end
 end

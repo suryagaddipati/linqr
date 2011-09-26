@@ -32,23 +32,4 @@ describe "Projection operators" do
     }.to_a
     text_nums.should == ["five", "four", "one", "three", "nine", "eight", "six", "seven", "two", "zero"]
   end
-  it "should return a thunk" do
-    natural_numbers = Enumerator.new do |yielder|
-      number = 1
-      loop do
-        yielder.yield number
-        number += 1
-      end
-    end
-
-#   plus_ones = _{
-#     from n
-#     where n < 5
-#     in_ natural_numbers
-#     select n 
-#   }.take(4)
-#   
-#  plus_ones.to_a.should == [1,2,3,4] 
-
-  end
 end
