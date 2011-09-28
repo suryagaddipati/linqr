@@ -65,6 +65,12 @@ module Ruby
     
     class WhereClause < LinqrClause
 
+      def visit(visitor)
+        visitor.visit_where_clause(self)
+      end
+      def expression
+        @call.arguments.first
+      end
     end
 
     class SelectClause < LinqrClause

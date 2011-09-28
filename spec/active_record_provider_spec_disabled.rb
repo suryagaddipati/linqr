@@ -31,7 +31,7 @@ describe "ActiveRecord Provider" do
       select o
 
     }
-    output.should == second_order
+    output.to_a.first.should == second_order
   end
   describe "group_by" do
     it "should group by the attribute" do 

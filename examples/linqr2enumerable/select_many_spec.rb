@@ -1,6 +1,6 @@
 require 'linqr'
-describe "Select operators" do
-  it "Compound From" do
+describe "Select Many" do
+  it "From clause can be used any number of times" do
     numbersA = [ 0, 2, 4, 5, 6, 8, 9 ]
     numbersB = [ 1, 3, 5, 7, 8 ]
     output = _{

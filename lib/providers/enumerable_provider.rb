@@ -58,6 +58,10 @@ class EnumerableProvider < EnumerableExpessionEvaluator
     exp.query_body.order_by_clause ? handle_order_by(exp,out) : out
   end
 
+  def visit_where_clause(where_clause)
+    where_clause.expression.visit(self)
+  end
+
   def evaluate_where(exp,out,e)
     if exp.query_body.where_clause
       if exp.query_body.where_clause.visit(self)
