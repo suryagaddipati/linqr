@@ -61,6 +61,9 @@ module Ruby
         token =@in_call.arguments.first
         token.evaluate_source_name(SourceNameEvaluator.new)
       end
+       def complete?
+         @from_call && @in_call
+       end
     end 
     
     class WhereClause < LinqrClause
@@ -81,13 +84,15 @@ module Ruby
 
     class QueryBody
       #from-or-where-clausesopt   orderby-clauseopt   select-or-group-clause   into-clauseopt
-      attr_accessor :from_clause, :where_clause , :select_clause , :into_clause 
+      attr_accessor :from_clauses, :where_clause , :select_clause , :into_clause 
       attr_accessor :group_by_clause, :order_by_clause
 
       def on_call(call)
           clause = case call.identifier.to_sym
                       when :from , :in_
-                        @from_clause ||= FromClause.new
+                        @from_clauses ||=[]
+                        @from_clauses << FromClause.new if @from_clauses.last.nil? or @from_clauses.last.complete?
+                        @from_clauses.last
                       when :select
                         @select_clause ||= SelectClause.new
                       when :where
