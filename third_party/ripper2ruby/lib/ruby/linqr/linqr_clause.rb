@@ -1,6 +1,7 @@
 module Ruby
   module Linqr
     class LinqrClause
+      attr_reader :call
       def on_call(call)
         @call = call
         true

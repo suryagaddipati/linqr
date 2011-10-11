@@ -42,6 +42,9 @@ module Ruby
   module Linqr
     class FromClause
       attr_reader :from_call
+      def initialize(in_clause= nil)
+        @in_call = in_clause.call
+      end
       def on_call(call)
         unless(complete =  @from_call && @in_call)
           case call.identifier.to_sym
@@ -81,27 +84,67 @@ module Ruby
 
     end
 
+    class InClause < LinqrClause
+    end
+    
+    class OnClause < WhereClause
+    end
+
+    class JoinClause < FromClause
+      #join-clause ::= join itemName in srcExpr on keyExpr == keyExpr (into itemName)?
+      attr_reader :on_clause
+      def initialize(in_clause, on_clause)
+        @on_clause = on_clause
+        super in_clause
+      end
+      def on_call(call)
+          case call.identifier.to_sym
+          when :join
+            @join_call = call
+          when :in_
+            @in_call = call
+          end
+      end
+
+      def identifiers
+        @join_call.arguments.collect(&:name).collect(&:to_sym)
+      end
+
+    end
 
     class QueryBody
-      #from-or-where-clausesopt   orderby-clauseopt   select-or-group-clause   into-clauseopt
+      #query-body ::= join-clause* (from-clause join-clause* |
+      #let-clause | where-clause)* orderby-clause? (select-clause |
+      #groupby-clause) query-continuation?
       attr_accessor :from_clauses, :where_clause , :select_clause , :into_clause 
       attr_accessor :group_by_clause, :order_by_clause
+      attr_accessor :join_clauses
 
       def on_call(call)
-          clause = case call.identifier.to_sym
-                      when :from , :in_
-                        @from_clauses ||=[]
-                        @from_clauses << FromClause.new if @from_clauses.last.nil? or @from_clauses.last.complete?
-                        @from_clauses.last
-                      when :select
-                        @select_clause ||= SelectClause.new
-                      when :where
-                        @where_clause ||= WhereClause.new
-                      when :order_by
-                        @order_by_clause ||= OrderByClause.new
-                      when :group_by
-                        @group_by_clause ||= GroupByClause.new
-                      end
+        clause = case call.identifier.to_sym
+                 when :join
+                   @join_clauses ||=[]
+                   @join_clauses << JoinClause.new(@in_clause,@on_clause)
+                   @join_clauses.last
+                 when :on 
+                   @on_clause = OnClause.new
+                   @on_clause
+                 when :from 
+                   @from_clauses ||=[]
+                   @from_clauses << FromClause.new(@in_clause)
+                   @from_clauses.last
+                 when :in_
+                   @in_clause = InClause.new
+                   @in_clause
+                 when :select
+                   @select_clause ||= SelectClause.new
+                 when :where
+                   @where_clause ||= WhereClause.new
+                 when :order_by
+                   @order_by_clause ||= OrderByClause.new
+                 when :group_by
+                   @group_by_clause ||= GroupByClause.new
+                 end
          clause.on_call(call) unless clause.nil?
       end
 
@@ -110,7 +153,7 @@ module Ruby
     class LinqrExp
       attr_accessor :from_clause, :query_body
       def initialize(binding)
-        @from_clause = FromClause.new
+        @from_clause = FromClause.new(InClause.new)
         @query_body = QueryBody.new
         @binding = binding
       end

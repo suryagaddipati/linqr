@@ -37,21 +37,33 @@ class EnumerableProvider < EnumerableExpessionEvaluator
     @variables[name.to_sym]  || @exp.variable_val(name)
   end
 
-  def eval_with_from_clause()
-
-  end
   def eval_from_clauses(from_clauses,exp,out)
     from_clause = from_clauses.first
     src = variable_val(from_clause.expression)
     src.each do |e|
       define_var(from_clause.identifiers.first,e)
       if(from_clauses.count == 1)
-        evaluate_where(exp,out,e)
+          evaluate_where(exp,out,e)
       else
         eval_from_clauses(from_clauses[1..-1],exp,out)
       end
     end
   end
+  
+
+
+def eval_join_clauses(join_clauses,exp,out)
+    join_clause = join_clauses.first
+    src = variable_val(join_clause.expression)
+    src.each do |e|
+      define_var(join_clause.identifiers.first,e)
+      if(join_clauses.count == 1 )
+          evaluate_where(exp,out,e)  if(join_clause.on_clause.visit(self))
+      else
+        eval_join_clauses(join_clauses[1..-1],exp,out)
+      end
+    end
+end
 
   def visit_linqr_exp(exp)
     @exp = exp
@@ -63,7 +75,11 @@ class EnumerableProvider < EnumerableExpessionEvaluator
       if(exp.query_body.from_clauses)
         eval_from_clauses(exp.query_body.from_clauses,exp,out)
       else
-        evaluate_where(exp,out,e)
+        if(exp.query_body.join_clauses)
+          eval_join_clauses(exp.query_body.join_clauses,exp,out)
+        else
+          evaluate_where(exp,out,e)
+        end
       end
 
     end
