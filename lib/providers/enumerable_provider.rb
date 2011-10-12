@@ -5,7 +5,7 @@ class EnumerableProvider < EnumerableExpessionEvaluator
 
   def handle_order_by(linq_exp,filtered_values)
     order_by = linq_exp.query_body.order_by_clause
-    filtered_values = filtered_values.to_enum #huh?
+    filtered_values = filtered_values.to_enum 
     order_by.expressions.reduce(filtered_values) do |values, sort_exp|
       values.lazy_sort_by do|e| 
         define_var(linq_exp.from_clause.identifiers.first,e)
@@ -55,10 +55,17 @@ class EnumerableProvider < EnumerableExpessionEvaluator
 def eval_join_clauses(join_clauses,exp,out)
     join_clause = join_clauses.first
     src = variable_val(join_clause.expression)
+    
+    filtered_values = []
     src.each do |e|
       define_var(join_clause.identifiers.first,e)
+       filtered_values << e if(join_clause.on_clause.visit(self))
+    end
+
+    filtered_values.each do |e|
+      define_var(join_clause.identifiers.first,e)
       if(join_clauses.count == 1 )
-          evaluate_where(exp,out,e)  if(join_clause.on_clause.visit(self))
+          evaluate_where(exp,out,e)  
       else
         eval_join_clauses(join_clauses[1..-1],exp,out)
       end
