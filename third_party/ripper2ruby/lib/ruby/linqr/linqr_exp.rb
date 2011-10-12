@@ -74,21 +74,30 @@ module Ruby
       def visit(visitor)
         visitor.visit_where_clause(self)
       end
+
       def expression
         @call.arguments.first
       end
     end
 
-    class SelectClause < LinqrClause
-      
+    class SelectClause < LinqrClause; end
 
-    end
+    class InClause < LinqrClause; end
 
-    class InClause < LinqrClause
-    end
     
-    class OnClause < WhereClause
+    class OnClause < LinqrClause
+      def visit(visitor)
+        visitor.visit_on_clause(self)
+      end
+      def lhs
+        @call.arguments.first.arg.identifier
+      end
+
+      def rhs
+        @call.arguments.first.arg.arguments.first.arg.arguments.first
+      end
     end
+
 
     class JoinClause < FromClause
       #join-clause ::= join itemName in srcExpr on keyExpr == keyExpr (into itemName)?

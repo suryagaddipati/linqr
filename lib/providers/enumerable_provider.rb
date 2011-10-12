@@ -96,7 +96,11 @@ end
   end
 
   def visit_where_clause(where_clause)
-    where_clause.expression.visit(self)
+     where_clause.expression.visit(self)
+  end
+
+  def visit_on_clause(node)
+    node.lhs.visit(self) == node.rhs.visit(self)
   end
 
   def evaluate_where(exp,out,e)

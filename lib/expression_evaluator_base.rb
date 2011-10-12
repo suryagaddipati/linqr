@@ -7,6 +7,10 @@ class ExpressionEvaluator
   def visit_variable(node)
     variable_val(node.to_s) 
   end
+  
+  def visit_identifier(node)
+    visit_variable(node)
+  end
 
   def visit_integer(node)
     node.value
