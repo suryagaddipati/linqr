@@ -94,7 +94,19 @@ module Ruby
       end
 
       def rhs
-        @call.arguments.first.arg.arguments.first.arg.arguments.first
+        rhs = @call.arguments.first.arg.arguments.first.arg.arguments.first.arg
+        rhs = rhs.clone
+        rhs.arguments = nil
+        rhs
+        #@call.arguments.first.arg.arguments.first.arg.arguments.first
+      end
+      
+      def group_join?
+        @call.to_ruby.split("into").length > 1
+      end
+
+      def group_join_var
+        @call.to_ruby.split("into")[1].to_sym
       end
     end
 
@@ -125,7 +137,7 @@ module Ruby
       #query-body ::= join-clause* (from-clause join-clause* |
       #let-clause | where-clause)* orderby-clause? (select-clause |
       #groupby-clause) query-continuation?
-      attr_accessor :from_clauses, :where_clause , :select_clause , :into_clause 
+      attr_accessor :from_clauses, :where_clause , :select_clause 
       attr_accessor :group_by_clause, :order_by_clause
       attr_accessor :join_clauses
 

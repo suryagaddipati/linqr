@@ -52,25 +52,33 @@ class EnumerableProvider < EnumerableExpessionEvaluator
   
 
 
-def eval_join_clauses(join_clauses,exp,out)
+  def eval_join_clauses(join_clauses,exp,out)
     join_clause = join_clauses.first
     src = variable_val(join_clause.expression)
-    
     filtered_values = []
     src.each do |e|
       define_var(join_clause.identifiers.first,e)
-       filtered_values << e if(join_clause.on_clause.visit(self))
+      filtered_values << e if(join_clause.on_clause.visit(self))
     end
 
-    filtered_values.each do |e|
-      define_var(join_clause.identifiers.first,e)
-      if(join_clauses.count == 1 )
+    if (join_clause.on_clause.group_join?)
+      return if filtered_values.empty?
+      define_var(join_clause.on_clause.group_join_var,filtered_values)
+      evaluate_where(exp,out,filtered_values)
+    else
+
+      filtered_values.each do |e|
+        define_var(join_clause.identifiers.first,e)
+        if(join_clauses.count == 1 )
           evaluate_where(exp,out,e)  
-      else
-        eval_join_clauses(join_clauses[1..-1],exp,out)
+        else
+          eval_join_clauses(join_clauses[1..-1],exp,out)
+        end
       end
+
     end
-end
+
+  end
 
   def visit_linqr_exp(exp)
     @exp = exp

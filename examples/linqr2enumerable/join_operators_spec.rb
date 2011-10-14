@@ -27,4 +27,20 @@ describe "Join Operations" do
     results.to_a.count.should == 3
     results.to_a.collect(&:name).should == ["pepsi", "coke", "peppers"]
   end
+
+
+  it "group join" do
+    categories = [ "Beverages", "Condiments", "Vegetables", "Dairy Listings", "Seafood" ]
+    products = [Listing.new("keyboard","computers"),Listing.new("pepsi","Beverages"),Listing.new("peppers","Vegetables"),Listing.new("coke","Beverages"),Listing.new("ice cream","Dairy Listings")]
+    results = _{
+      from c in_ categories
+      join p in_ products on c equals p.category into ps
+      select  category:  c, products:  ps
+    }
+    results.to_a.count.should == 3
+    results.to_a.collect(&:category).should == ["Beverages", "Vegetables", "Dairy Listings"]
+    results.to_a.collect(&:products).first.collect(&:name).should == ["pepsi", "coke"]
+    results.to_a.collect(&:products)[1].collect(&:name).should == ["peppers"]
+    results.to_a.collect(&:products)[2].collect(&:name).should == ["ice cream"]
+  end
 end
