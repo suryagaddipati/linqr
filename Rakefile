@@ -48,3 +48,9 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+task :generate_wiki do 
+  load "wiki_generator.rb"
+  Dir.glob("examples/*/**").each {|f| write_wiki(f)}
+  ` cd  linqr.wiki`
+end
