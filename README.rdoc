@@ -8,14 +8,16 @@ model so developers can still use the familiar sytax to query the data
 source instead of learning a whole new api.
 
 
-== Some Usage Examples ( see wiki for detailed examples)
+== Some Examples ( see wiki for detailed examples)
+===Simple join
 http://i.imgur.com/jgGl7.png
 
-
+===Multi Join
 http://i.imgur.com/74Exj.png
 
-http://imgur.com/Vt9ty.png
-
-http://imgur.com/xqhFi.png
-
-http://imgur.com/UQhAa.png
+===Multi Select
+http://i.imgur.com/i6v6z.png
+===Group Join
+http://i.imgur.com/IKlMT.png
+===Order by
+http://i.imgur.com/MGW3Z.png
