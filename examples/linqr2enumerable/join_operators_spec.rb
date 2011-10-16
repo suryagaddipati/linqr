@@ -43,4 +43,16 @@ describe "Join Operations" do
     results.to_a.collect(&:products)[1].collect(&:name).should == ["peppers"]
     results.to_a.collect(&:products)[2].collect(&:name).should == ["ice cream"]
   end
+
+  it "Cross Join with Group Join" do
+    categories = [ "Beverages", "Condiments", "Vegetables", "Dairy Listings", "Seafood" ]
+    products = [Listing.new("keyboard","computers"),Listing.new("pepsi","Beverages"),Listing.new("peppers","Vegetables"),Listing.new("coke","Beverages"),Listing.new("ice cream","Dairy Listings")]
+    results = _{
+      from c in_ categories
+      join p in_ products on c equals p.category into ps
+      from p in_ ps
+      select  category:  c, product:  p.name
+    }
+    results.collect{|a|[a.category,a.product]}.should == [["Beverages","pepsi"], ["Beverages","coke"], ["Vegetables","peppers"], ["Dairy Listings","ice cream"]]
+  end
 end

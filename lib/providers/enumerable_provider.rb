@@ -64,13 +64,13 @@ class EnumerableProvider < EnumerableExpessionEvaluator
     if (join_clause.on_clause.group_join?)
       return if filtered_values.empty?
       define_var(join_clause.on_clause.group_join_var,filtered_values)
-      evaluate_where(exp,out,filtered_values)
+      eval_from_and_where(exp,out,filtered_values)
     else
 
       filtered_values.each do |e|
         define_var(join_clause.identifiers.first,e)
         if(join_clauses.count == 1 )
-          evaluate_where(exp,out,e)  
+          eval_from_and_where(exp,out,e)  
         else
           eval_join_clauses(join_clauses[1..-1],exp,out)
         end
@@ -78,6 +78,14 @@ class EnumerableProvider < EnumerableExpessionEvaluator
 
     end
 
+  end
+  
+  def eval_from_and_where(exp,out,e)
+    if(exp.query_body.from_clauses)
+      eval_from_clauses(exp.query_body.from_clauses,exp,out)
+    else
+      evaluate_where(exp,out,e)
+    end
   end
 
   def visit_linqr_exp(exp)
@@ -87,16 +95,11 @@ class EnumerableProvider < EnumerableExpessionEvaluator
     out = []
     source.each do |e|
       define_var(from_clause.identifiers.first,e)
-      if(exp.query_body.from_clauses)
-        eval_from_clauses(exp.query_body.from_clauses,exp,out)
+      if(exp.query_body.join_clauses)
+        eval_join_clauses(exp.query_body.join_clauses,exp,out)
       else
-        if(exp.query_body.join_clauses)
-          eval_join_clauses(exp.query_body.join_clauses,exp,out)
-        else
-          evaluate_where(exp,out,e)
-        end
+        eval_from_and_where(exp,out,e)
       end
-
     end
 
     out = exp.query_body.group_by_clause ? handle_group_by(exp,out):out 
