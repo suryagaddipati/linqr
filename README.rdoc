@@ -8,83 +8,13 @@ model so developers can still use the familiar sytax to query the data
 source instead of learning a whole new api.
 
 
-== Usage
+== Some Usage Examples ( see wiki for detailed examples)
+http://i.imgur.com/jgGl7.png
 
-=== Querying enumerable
-* Quering an array
+http://imgur.com/9MDGj.png
 
-    numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    output =  _{ 
-      from x
-      in_ numbers
-      where (x == 3 ||  x == 5 || x == 8) && ( x % 2) == 0
-      select x * 3
-    }
-    output.should == [24]
+http://imgur.com/Vt9ty.png
 
-* Quering a hash
+http://imgur.com/xqhFi.png
 
-    hash = {:a => 1 , :b => 2 , :c => 3}
-    output = _{
-      from k,v
-      in_ hash
-      where v == 3
-      select k
-    }
-   output.should == [:c]
-
-* Grouping(select can select into anonymous types)
-
-    numbers = [ 5, 4, 1, 3, 9, 8, 6, 7, 2, 0 ]
-    number_groups = _{
-      from n 
-      in_ numbers
-      where n > 3 && n < 100
-      group_by n % 5  => :g
-      select :remainder => g.key , :values => g.values
-    }
-    number_groups.collect(&:remainder).should == [0, 4, 1, 3, 2]
-
-* Ordering 
-
-    words = [ "cherry", "apple", "blueberry" ]
-    sorted_words = _{
-      from word 
-      in_ words
-      order_by word.length
-      select word
-    }
-    sorted_words.should == ["apple", "cherry", "blueberry"]
-* Selecting into anonymous types
-
-    products = [Product.new("shoes", 1.75), Product.new("glasses", 55.55), Product.new("pencil", 5.20)]
-    
-    cheap_product_names = _{
-      from p
-      in_ products 
-      where p.price < 10
-      select :name => "Cheap - #{p.name}" , :new_price => p.price + 10
-    }
-    
-    cheap_product_names.collect(&:name).should == ["Cheap - shoes","Cheap - pencil"]
-    cheap_product_names.collect(&:new_price).should == [11.75, 15.20]
-
-=== Querying ActiveRecord Models
- All the examples listed for enumerable should work with activerecord models too
-
-    grouped_by_name = _{
-        from o 
-        in_ Order
-        order_by o.name
-        group_by o.name   => :g
-        select :name => g.key , :orders => g.values
-      }
-
-=== Querying Groupon Api
-    output =  _{·
-      from deal
-      in_  GrouponDeals
-      where deal.lat == 38.8339 && deal.lng == -104.821·
-      select deal
-    }
-
+http://imgur.com/UQhAa.png
