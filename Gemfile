@@ -6,6 +6,8 @@ group :development do
   gem "sourcify", "~> 0.5.0"
   gem "ruby-debug19"
   gem "ripper2ruby"
+  gem "mongoid"
+  gem 'mongoid-rspec'
 end
 
 

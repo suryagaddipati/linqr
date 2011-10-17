@@ -89,7 +89,6 @@ class EnumerableProvider < EnumerableExpessionEvaluator
   end
 
   def visit_linqr_exp(exp)
-    @exp = exp
     from_clause = exp.from_clause
     source = exp.source
     out = []

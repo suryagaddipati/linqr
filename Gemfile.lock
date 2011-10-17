@@ -16,6 +16,7 @@ GEM
     archive-tar-minitar (0.5.2)
     arel (2.2.1)
     bcrypt-ruby (3.0.0)
+    bson (1.4.1)
     builder (3.0.0)
     columnize (0.3.4)
     crack (0.1.8)
@@ -36,6 +37,15 @@ GEM
       rake
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
+    mongo (1.4.1)
+      bson (= 1.4.1)
+    mongoid (2.3.2)
+      activemodel (~> 3.1)
+      mongo (~> 1.4)
+      tzinfo (~> 0.3.22)
+    mongoid-rspec (1.4.4)
+      mongoid (~> 2.0)
+      rspec (~> 2)
     multi_json (1.0.3)
     mysql (2.8.1)
     rake (0.8.7)
@@ -80,6 +90,8 @@ DEPENDENCIES
   bundler (~> 1.0.0)
   groupon (~> 0.0.1)
   jeweler (~> 1.6.4)
+  mongoid
+  mongoid-rspec
   mysql (~> 2.8.1)
   rake (= 0.8.7)
   ripper2ruby
