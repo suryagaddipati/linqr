@@ -19,7 +19,7 @@ class Ruby::Arg
 end
 class Ruby::Call
   def name
-    identifier.to_ruby
+    target.nil? ? self.identifier.to_ruby : "#{target.to_ruby}.#{identifier.to_ruby}"
   end
 end
 class Ruby::Variable
