@@ -19,17 +19,17 @@ class Ruby::Arg
 end
 class Ruby::Call
   def name
-    identifier.to_s
+    identifier.to_ruby
   end
 end
 class Ruby::Variable
   def name
-    to_s
+    to_ruby
   end
 end
 
 class Ruby::Const
   def name
-    identifier.to_s
+    identifier.to_ruby
   end
 end

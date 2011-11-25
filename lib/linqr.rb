@@ -1,6 +1,7 @@
 $:.unshift(File.expand_path(File.dirname(__FILE__)))
 require 'providers/enumerable_provider'
 require 'providers/mongodb/mongodb_provider'
+require 'providers/sql/sql_provider'
 require 'providers/hash_provider'
 $:.unshift File.join(File.dirname(__FILE__),'..','third_party','ripper2ruby','lib')
 require 'ripper2ruby'
