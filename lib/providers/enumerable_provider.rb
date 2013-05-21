@@ -115,6 +115,7 @@ class EnumerableProvider < EnumerableExpessionEvaluator
   end
 
   def evaluate_where(exp,out,e)
+    debugger
     if exp.query_body.where_clause
       if exp.query_body.where_clause.visit(self)
         out << (exp.query_body.group_by_clause ? e :  exp.query_body.select_clause.visit(self))
