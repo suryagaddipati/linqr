@@ -1,4 +1,4 @@
-env:
+environment:
  language: ruby
  language_version:  '1.9.2-p290'
 build:
