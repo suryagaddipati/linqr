@@ -1,3 +1,5 @@
-language: ruby
-ruby_version:  'ruby-1.9.2-p290'
-script: echo hello
+env:
+ language: ruby
+ language_version:  '1.9.2-p290'
+build:
+ run: echo hello
