@@ -4,4 +4,4 @@ environment:
    - '1.9.2-p290'
 
 build:
- run: echo hello 
+ run: echo $BLAH 
