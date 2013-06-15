@@ -1,7 +1,8 @@
 environment:
  language: ruby
  language_versions: 
-   - '1.9.2-p290'
+   - 1.9.2-p290
+   - 1.9.2-p290
 
 build:
- run: echo $BLAH 
+ run: echo $DOTCI_PUSHER 
