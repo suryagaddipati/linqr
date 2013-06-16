@@ -2,7 +2,7 @@ environment:
  language: ruby
  language_versions: 
    - 1.9.2-p290
-   - 1.9.2-p290
+   - 1.9.3-p2e90
 
 build:
  run: echo $DOTCI_PUSHER 
