@@ -5,5 +5,5 @@ environment:
    - 1.9.3-p2e90
 
 build:
- if: DOTCI_PUSHER == 'suryagaddipati'
+ if: DOTCI_PUSHER != 'suryagaddipati'
  run: echo $DOTCI_PUSHER 
