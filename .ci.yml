@@ -6,3 +6,4 @@ environment:
 
 build:
  run: echo $DOTCI_PUSHER 
+ after: echo finished building $DOTCI_BRANCH
