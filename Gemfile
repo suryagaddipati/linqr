@@ -14,5 +14,5 @@ group :test do
   gem "rspec", "~> 2.4.0"
   gem "activerecord", "~> 3.1.0"
   gem "groupon", "~> 0.0.1"
-  gem "mysql", "~> 2.8.1"
+#  gem "mysql", "~> 2.8.1"
 end

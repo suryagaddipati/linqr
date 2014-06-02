@@ -46,7 +46,6 @@ GEM
       rspec (~> 2)
     multi_json (1.2.0)
     multi_xml (0.5.1)
-    mysql (2.8.1)
     rake (0.8.7)
     ripper2ruby (0.0.2)
     rspec (2.4.0)
@@ -90,7 +89,6 @@ DEPENDENCIES
   jeweler (~> 1.6.4)
   mongoid
   mongoid-rspec
-  mysql (~> 2.8.1)
   rake (= 0.8.7)
   ripper2ruby
   rspec (~> 2.4.0)
