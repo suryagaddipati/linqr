@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source "https://www.rubygems.org"
 group :development do
   gem "rake", "0.8.7"
   gem "jeweler", "~> 1.6.4"
