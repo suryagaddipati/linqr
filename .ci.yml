@@ -1,9 +1,3 @@
 environment:
- language: ruby
- language_versions: 
-   - 1.9.2-p290 : { if: DOTCI_PUSHER != '1suryagaddipati' }
-   - 1.9.3-p2e90
+  image: nkwhr/ruby
 
-build:
- run: echo $DOTCI_PUSHER 
- after: echo finished building $DOTCI_BRANCH
