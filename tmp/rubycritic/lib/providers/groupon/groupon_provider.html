@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <h1 class="logo"><a href="../../../overview.html" class="logo-link">RubyCritic</a></h1>
+      <nav class="project-nav">
+        <a href="../../../overview.html" class="project-nav-item">Overview</a>
+        <a href="../../../code_index.html" class="project-nav-item">Code</a>
+        <a href="../../../smells_index.html" class="project-nav-item">Smells</a>
+      </nav>
+    </header>
+    <div class="file-header group">
+  <span class="rating-b circled-text circle ">B</span>
+  <h2 class="file-name">GrouponDeals</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2011-09-01 09:46:33 -0500'>2011-09-01 09:46:33 -0500</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      30 complexity
+    </div>
+    <div class="file-stat">
+      6.0 complexity per method
+    </div>
+    <div class="file-stat">
+      4 churn
+    </div>
+    <div class="file-stat">
+      5 methods
+    </div>
+    <div class="file-stat">
+      16 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require 'groupon'
+require 'expression_evaluator_base'
+class GrouponDeals
+
+  def self.linqr_provider
+   self
+  end
+  def self.evaluate(linq_exp)
+    Groupon.api_key = '966a0273f2974c725e25d507d4e07daabcb0ee00'
+    evaluator = GrouponExpressionEvaluator.new(linq_exp)
+    linq_exp.where.visit(evaluator)
+    selected_values = Groupon.deals(evaluator.conditions)
+    #puts evaluator.conditions.inspect
+    selected_values.collect do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) GrouponDeals#self.evaluate has the variable name 'e'          </span>  </li></ul>
+      Object.send(:define_method,linq_exp.variable.to_sym) { e }
+      linq_exp.select.visit(EnumerableExpessionEvaluator.new(linq_exp))
+    end
+  end
+end
+
+
+class GrouponExpressionEvaluator &lt; ExpressionEvaluator
+  attr_reader :conditions
+  def initialize(linq_exp)
+    @conditions = {}
+    super
+  end
+
+  def visit_binary(node)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateCode) Identical code found in 2 nodes                        <a href="../active_record/active_record_expression_evaluator.html#L20" class="js-smell-location">0</a>                  <a href="groupon_provider.html#L29" class="js-smell-location">1</a>                  </span>  </li></ul>
+    right_val = node.right.visit(self)
+    left_val = node.left.visit(self)
+    @conditions[left_val] = right_val
+  end
+
+
+  def visit_call(node)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(FeatureEnvy) GrouponExpressionEvaluator#visit_call refers to node more than self          </span>  </li></ul>
+    node.identifier.to_s.to_sym
+  end
+
+
+end
+</code>
+
+    <script src='../../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../../assets/javascripts/jquery.tablesorter-2.0.js'></script>
+    <script src='../../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../../assets/javascripts/application.js'></script>
+  </body>
+</html>

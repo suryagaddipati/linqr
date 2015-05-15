@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <h1 class="logo"><a href="../../overview.html" class="logo-link">RubyCritic</a></h1>
+      <nav class="project-nav">
+        <a href="../../overview.html" class="project-nav-item">Overview</a>
+        <a href="../../code_index.html" class="project-nav-item">Code</a>
+        <a href="../../smells_index.html" class="project-nav-item">Smells</a>
+      </nav>
+    </header>
+    <div class="file-header group">
+  <span class="rating-c circled-text circle ">C</span>
+  <h2 class="file-name">EnumerableProvider</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2013-05-21 12:58:12 -0500'>2013-05-21 12:58:12 -0500</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      171 complexity
+    </div>
+    <div class="file-stat">
+      14.3 complexity per method
+    </div>
+    <div class="file-stat">
+      32 churn
+    </div>
+    <div class="file-stat">
+      12 methods
+    </div>
+    <div class="file-stat">
+      50 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require 'providers/enumerable_expression_evaluator'
+require 'lazy_enumerator'
+require 'group_by'
+class EnumerableProvider &lt; EnumerableExpessionEvaluator
+
+  def handle_order_by(linq_exp,filtered_values)
+    order_by = linq_exp.query_body.order_by_clause
+    filtered_values = filtered_values.to_enum 
+    order_by.expressions.reduce(filtered_values) do |values, sort_exp|
+      values.lazy_sort_by do|e| <ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#handle_order_by has the variable name 'e'          </span>  </li></ul>
+        define_var(linq_exp.from_clause.identifiers.first,e)
+        sort_val = sort_exp.visit(self)
+        order_by.descending?? 1 - sort_val : sort_val
+      end
+    end
+  end
+
+  def handle_group_by(exp,filtered_values)
+    group_by = exp.query_body.group_by_clause
+    grouped_values = filtered_values.group_by do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#handle_group_by has the variable name 'e'          </span>  </li></ul>
+      define_var(exp.from_clause.identifiers.first,e)
+      group_by.visit(self)
+    end
+
+    grouped_values.collect do |(k,v)|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#handle_group_by has the variable name 'k'          </span>  </li>  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#handle_group_by has the variable name 'v'          </span>  </li></ul>
+      define_var(group_by.grouping_var.to_sym, Grouped.new(k,v) )
+    exp.query_body.select_clause.visit(self)
+    end
+  end
+
+
+  def define_var(var_name,val)
+    @variables ||= {}
+    @variables[var_name] = val
+  end
+  def variable_val(name)
+    @variables[name.to_sym]  || @exp.variable_val(name)
+  end
+
+  def eval_from_clauses(from_clauses,exp,out)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DataClump) EnumerableProvider takes parameters [exp, out] to 4 methods                        <a href="enumerable_provider.html#L40" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L55" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L83" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L117" class="js-smell-location">3</a>                  </span>  </li></ul>
+    from_clause = from_clauses.first
+    src = variable_val(from_clause.expression)
+    src.each do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateCode) Similar code found in 2 nodes                        <a href="enumerable_provider.html#L43" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L70" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#eval_from_clauses has the variable name 'e'          </span>  </li></ul>
+      define_var(from_clause.identifiers.first,e)
+      if(from_clauses.count == 1)
+          evaluate_where(exp,out,e)
+      else
+        eval_from_clauses(from_clauses[1..-1],exp,out)
+      end
+    end
+  end
+  
+
+
+  def eval_join_clauses(join_clauses,exp,out)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(HighComplexity) EnumerableProvider#eval_join_clauses has a flog score of 38          </span>  </li>  <li class="smell old">    <span class="description">(DataClump) EnumerableProvider takes parameters [exp, out] to 4 methods                        <a href="enumerable_provider.html#L40" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L55" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L83" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L117" class="js-smell-location">3</a>                  </span>  </li></ul>
+    join_clause = join_clauses.first
+    src = variable_val(join_clause.expression)
+    filtered_values = []
+    src.each do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#eval_join_clauses has the variable name 'e'                        <a href="enumerable_provider.html#L59" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L70" class="js-smell-location">1</a>                  </span>  </li></ul>
+      define_var(join_clause.identifiers.first,e)
+      filtered_values &lt;&lt; e if(join_clause.on_clause.visit(self))<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#eval_join_clauses calls join_clause.on_clause 3 times                        <a href="enumerable_provider.html#L61" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L64" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L66" class="js-smell-location">2</a>                  </span>  </li></ul>
+    end
+
+    if (join_clause.on_clause.group_join?)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#eval_join_clauses calls join_clause.on_clause 3 times                        <a href="enumerable_provider.html#L61" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L64" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L66" class="js-smell-location">2</a>                  </span>  </li></ul>
+      return if filtered_values.empty?
+      define_var(join_clause.on_clause.group_join_var,filtered_values)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#eval_join_clauses calls join_clause.on_clause 3 times                        <a href="enumerable_provider.html#L61" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L64" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L66" class="js-smell-location">2</a>                  </span>  </li></ul>
+      eval_from_and_where(exp,out,filtered_values)
+    else
+
+      filtered_values.each do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateCode) Similar code found in 2 nodes                        <a href="enumerable_provider.html#L43" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L70" class="js-smell-location">1</a>                  </span>  </li>  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#eval_join_clauses has the variable name 'e'                        <a href="enumerable_provider.html#L59" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L70" class="js-smell-location">1</a>                  </span>  </li></ul>
+        define_var(join_clause.identifiers.first,e)
+        if(join_clauses.count == 1 )
+          eval_from_and_where(exp,out,e)  
+        else
+          eval_join_clauses(join_clauses[1..-1],exp,out)
+        end
+      end
+
+    end
+
+  end
+  
+  def eval_from_and_where(exp,out,e)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DataClump) EnumerableProvider takes parameters [exp, out] to 4 methods                        <a href="enumerable_provider.html#L40" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L55" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L83" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L117" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell old">    <span class="description">(UncommunicativeParameterName) EnumerableProvider#eval_from_and_where has the parameter name 'e'          </span>  </li></ul>
+    if(exp.query_body.from_clauses)
+      eval_from_clauses(exp.query_body.from_clauses,exp,out)
+    else
+      evaluate_where(exp,out,e)
+    end
+  end
+
+  def visit_linqr_exp(exp)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(HighComplexity) EnumerableProvider#visit_linqr_exp has a flog score of 25          </span>  </li></ul>
+    @exp = exp
+    from_clause = exp.from_clause
+    source = exp.source
+    out = []
+    source.each do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableProvider#visit_linqr_exp has the variable name 'e'          </span>  </li></ul>
+      define_var(from_clause.identifiers.first,e)
+      if(exp.query_body.join_clauses)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#visit_linqr_exp calls exp.query_body 4 times                        <a href="enumerable_provider.html#L98" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L99" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L105" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L106" class="js-smell-location">3</a>                  </span>  </li></ul>
+        eval_join_clauses(exp.query_body.join_clauses,exp,out)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#visit_linqr_exp calls exp.query_body 4 times                        <a href="enumerable_provider.html#L98" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L99" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L105" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L106" class="js-smell-location">3</a>                  </span>  </li></ul>
+      else
+        eval_from_and_where(exp,out,e)
+      end
+    end
+
+    out = exp.query_body.group_by_clause ? handle_group_by(exp,out):out <ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#visit_linqr_exp calls exp.query_body 4 times                        <a href="enumerable_provider.html#L98" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L99" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L105" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L106" class="js-smell-location">3</a>                  </span>  </li></ul>
+    exp.query_body.order_by_clause ? handle_order_by(exp,out) : out<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#visit_linqr_exp calls exp.query_body 4 times                        <a href="enumerable_provider.html#L98" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L99" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L105" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L106" class="js-smell-location">3</a>                  </span>  </li></ul>
+  end
+
+  def visit_where_clause(where_clause)
+     where_clause.expression.visit(self)
+  end
+
+  def visit_on_clause(node)
+    node.lhs.visit(self) == node.rhs.visit(self)
+  end
+
+  def evaluate_where(exp,out,e)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DataClump) EnumerableProvider takes parameters [exp, out] to 4 methods                        <a href="enumerable_provider.html#L40" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L55" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L83" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L117" class="js-smell-location">3</a>                  </span>  </li>  <li class="smell old">    <span class="description">(UncommunicativeParameterName) EnumerableProvider#evaluate_where has the parameter name 'e'          </span>  </li>  <li class="smell old">    <span class="description">(FeatureEnvy) EnumerableProvider#evaluate_where refers to exp more than self          </span>  </li></ul>
+    debugger
+    if exp.query_body.where_clause<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#evaluate_where calls exp.query_body 5 times                        <a href="enumerable_provider.html#L119" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L120" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L121" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L124" class="js-smell-location">3</a>                  </span>  </li></ul>
+      if exp.query_body.where_clause.visit(self)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#evaluate_where calls exp.query_body 5 times                        <a href="enumerable_provider.html#L119" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L120" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L121" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L124" class="js-smell-location">3</a>                  </span>  </li></ul>
+        out &lt;&lt; (exp.query_body.group_by_clause ? e :  exp.query_body.select_clause.visit(self))<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#evaluate_where calls exp.query_body 5 times                        <a href="enumerable_provider.html#L119" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L120" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L121" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L124" class="js-smell-location">3</a>                  </span>  </li></ul>
+      end
+    else
+      out &lt;&lt; exp.query_body.select_clause.visit(self)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableProvider#evaluate_where calls exp.query_body 5 times                        <a href="enumerable_provider.html#L119" class="js-smell-location">0</a>                  <a href="enumerable_provider.html#L120" class="js-smell-location">1</a>                  <a href="enumerable_provider.html#L121" class="js-smell-location">2</a>                  <a href="enumerable_provider.html#L124" class="js-smell-location">3</a>                  </span>  </li></ul>
+    end
+  end
+end
+
+
+module  Enumerable
+  def linqr_provider
+    EnumerableProvider.new(self)
+  end
+end
+</code>
+
+    <script src='../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../assets/javascripts/jquery.tablesorter-2.0.js'></script>
+    <script src='../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../assets/javascripts/application.js'></script>
+  </body>
+</html>

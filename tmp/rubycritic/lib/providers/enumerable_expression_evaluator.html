@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>RubyCritic</title>
+    <link href="../../assets/stylesheets/application.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <link href="../../assets/stylesheets/prettify.custom_theme.css" media="screen, projection, print" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <header class="project-header group">
+      <h1 class="logo"><a href="../../overview.html" class="logo-link">RubyCritic</a></h1>
+      <nav class="project-nav">
+        <a href="../../overview.html" class="project-nav-item">Overview</a>
+        <a href="../../code_index.html" class="project-nav-item">Code</a>
+        <a href="../../smells_index.html" class="project-nav-item">Smells</a>
+      </nav>
+    </header>
+    <div class="file-header group">
+  <span class="rating-a circled-text circle ">A</span>
+  <h2 class="file-name">EnumerableExpessionEvaluator</h2>
+
+  <span class="file-committed-at">
+    
+      Updated <time class='js-timeago' datetime='2011-09-23 17:54:59 -0500'>2011-09-23 17:54:59 -0500</time>
+    
+  </span>
+
+  <div class="file-stats group">
+    <div class="file-stat">
+      74 complexity
+    </div>
+    <div class="file-stat">
+      12.3 complexity per method
+    </div>
+    <div class="file-stat">
+      5 churn
+    </div>
+    <div class="file-stat">
+      6 methods
+    </div>
+    <div class="file-stat">
+      0 duplication
+    </div>
+  </div>
+
+  
+    <button id="js-toggle-smells" class="smells-toggle-button button">Toggle Smells</button>
+  
+</div>
+
+<code class="prettyprint linenums lang-ruby file-code js-file-code">require 'ostruct'
+require 'expression_evaluator_base'
+class EnumerableExpessionEvaluator &lt; ExpressionEvaluator
+
+  def visit_group_by(node)
+    node.expression.visit(self)
+  end
+
+  def visit_hash(node)
+    record = OpenStruct.new
+    node.elements.each do |e|<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableExpessionEvaluator#visit_hash has the variable name 'e'          </span>  </li></ul>
+      key = e.key.visit(self)
+      value = e.value.visit(self)
+      record.send(&quot;#{key.to_s}=&quot;.to_sym,value)
+    end
+    record
+  end
+
+  def visit_argslist(node)
+    node.map {|arg| arg.visit(self)}
+  end
+
+  def visit_array(node)
+    node.elements.collect(&amp;:arg).reduce([]){|out,n| out &lt;&lt; variable_val(n) ; out}<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableExpessionEvaluator#visit_array has the variable name 'n'          </span>  </li></ul>
+  end
+
+  def visit_binary(node)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(FeatureEnvy) EnumerableExpessionEvaluator#visit_binary refers to node more than self          </span>  </li></ul>
+    right_val = node.right.visit(self)
+    left_val = node.left.visit(self)
+    if node.operator.to_sym == :and<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableExpessionEvaluator#visit_binary calls node.operator 3 times                        <a href="enumerable_expression_evaluator.html#L30" class="js-smell-location">0</a>                  <a href="enumerable_expression_evaluator.html#L32" class="js-smell-location">1</a>                  <a href="enumerable_expression_evaluator.html#L35" class="js-smell-location">2</a>                  </span>  </li></ul>
+      left_val &amp;&amp; right_val
+    elsif node.operator.to_sym == :or<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableExpessionEvaluator#visit_binary calls node.operator 3 times                        <a href="enumerable_expression_evaluator.html#L30" class="js-smell-location">0</a>                  <a href="enumerable_expression_evaluator.html#L32" class="js-smell-location">1</a>                  <a href="enumerable_expression_evaluator.html#L35" class="js-smell-location">2</a>                  </span>  </li></ul>
+      left_val || right_val
+    else
+      left_val.send(node.operator.to_ruby.to_sym, right_val)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(DuplicateMethodCall) EnumerableExpessionEvaluator#visit_binary calls node.operator 3 times                        <a href="enumerable_expression_evaluator.html#L30" class="js-smell-location">0</a>                  <a href="enumerable_expression_evaluator.html#L32" class="js-smell-location">1</a>                  <a href="enumerable_expression_evaluator.html#L35" class="js-smell-location">2</a>                  </span>  </li></ul>
+    end
+  end
+
+  def visit_call(node)<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(FeatureEnvy) EnumerableExpessionEvaluator#visit_call refers to node more than self          </span>  </li></ul>
+    target = node.target.visit(self)
+    method_name = node.identifier ? node.identifier.to_sym : :[]
+    if (node.arguments)
+      arguments = node.arguments.collect { |x| x.visit(self) }<ul class="nocode smells js-smells">  <li class="smell old">    <span class="description">(UncommunicativeVariableName) EnumerableExpessionEvaluator#visit_call has the variable name 'x'          </span>  </li></ul>
+      target.send(method_name, *arguments)
+    else
+      target.send(method_name)
+    end
+  end
+end
+
+</code>
+
+    <script src='../../assets/javascripts/jquery-2.1.0.js'></script>
+    <script src='../../assets/javascripts/jquery.tablesorter-2.0.js'></script>
+    <script src='../../assets/javascripts/jquery.floatThead-v1.2.7.js'></script>
+    <script src='../../assets/javascripts/jquery.timeago-v1.4.1.js'></script>
+    <script src='../../assets/javascripts/highcharts.src-4.0.1.js'></script>
+    <script src='../../assets/javascripts/jquery.scrollTo-1.4.11.js'></script>
+    <script src='../../assets/javascripts/prettify-4-Mar-2013.js'></script>
+    <script src='../../assets/javascripts/application.js'></script>
+  </body>
+</html>
