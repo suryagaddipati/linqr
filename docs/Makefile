@@ -1,0 +1,3 @@
+publish:
+	gitbook build
+
