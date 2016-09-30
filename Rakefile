@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'bundler'
+#safasf
 begin
   Bundler.setup(:default, :development,:test)
 rescue Bundler::BundlerError => e
